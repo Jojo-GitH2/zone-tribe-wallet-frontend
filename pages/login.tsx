@@ -6,6 +6,8 @@ export default function Login() {
     <Container maxWidth="xs">
       <Box
         sx={{
+          backgroundColor: "background.paper",
+          color: "text.primary",
           mt: 8,
           p: 4,
           borderRadius: 2,
