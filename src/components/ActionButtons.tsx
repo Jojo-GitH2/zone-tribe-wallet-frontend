@@ -6,7 +6,7 @@ const ActionButtons: React.FC = () => {
     <Stack
       direction="row"
       spacing={2} // Adds spacing between buttons
-      sx={{ mt: 6 }}
+      sx={{ mt: 8 }}
     >
       {/* Grouped Action Buttons */}
       <Box sx={{ display: "flex", gap: 2 }}>
