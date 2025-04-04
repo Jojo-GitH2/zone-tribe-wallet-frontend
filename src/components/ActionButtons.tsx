@@ -3,10 +3,13 @@ import { Button, Stack, Box } from "@mui/material";
 
 const ActionButtons: React.FC = () => {
   return (
-    <Stack
-      direction="row"
-      spacing={2} // Adds spacing between buttons
-      sx={{ mt: 8 }}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between", // Pushes the buttons to opposite ends
+        alignItems: "center", // Aligns buttons vertically
+        mt: 8,
+      }}
     >
       {/* Grouped Action Buttons */}
       <Box sx={{ display: "flex", gap: 2 }}>
@@ -47,21 +50,27 @@ const ActionButtons: React.FC = () => {
           Stake
         </Button>
       </Box>
-      
 
       {/* Add an Account Button */}
       <Button
-        variant="contained"
+        variant="outlined"
         sx={{
           borderRadius: "20px", // Rounded edges
-          textTransform: "capitalize", // Title case
-          marginRight: "auto", // Pushes this button to the extreme right
-          
+          textTransform: "none", // Title case
+          border: "1px solid white", // White border
+          backgroundColor: "transparent", // Transparent background
+          color: "white", // White text
+          transition: "all 0.7s ease", // Smooth transition for hover effects
+          "&:hover": {
+            backgroundColor: "primary.main", // Change background color on hover
+            color: "white", // Change text color on hover
+            border: "none", // Remove border on hover
+          },
         }}
       >
-        + Add an Account
+        + Add an account
       </Button>
-    </Stack>
+    </Box>
   );
 };
 
