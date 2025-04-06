@@ -11,7 +11,7 @@ const Dashboard: React.FC = () => {
     <Box sx={{ display: "flex" }}>
       <Sidebar />
       <Box sx={{ flexGrow: 1, p: 3 }}>
-        <TopBar />
+        {/* <TopBar /> */}
         <ActionButtons />
         <WalletSection />
         <TabsSection />

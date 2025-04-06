@@ -18,7 +18,7 @@ const TopBar: React.FC = () => {
 }>
     <Toolbar>
     <Typography variant="h6" sx = {{ flexGrow: 1 }}>
-        Zone Tribe Wallet
+        {/* Zone Tribe Wallet */}
         </Typography>
         < InputBase
 placeholder = "Search…"
