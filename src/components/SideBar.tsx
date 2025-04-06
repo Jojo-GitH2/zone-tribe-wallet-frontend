@@ -42,7 +42,7 @@ const Sidebar: React.FC = () => {
             flexDirection: "column", // Stack items vertically
             alignItems: "flex-start", // Align items to the left
             overflow: "hidden", // Prevent overflow
-            borderRight: "1px solid rgba(255, 255, 255, 0.2)", // Add a faint right border
+            borderRight: "0.5px solid rgba(255, 255, 255, 0.2)", // Add a faint right border
           },
         }}
       >
