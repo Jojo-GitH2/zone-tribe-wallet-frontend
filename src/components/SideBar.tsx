@@ -4,14 +4,20 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemIcon,
   Typography,
   IconButton,
   Box,
 } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import {
+  ChevronLeft,
+  ChevronRight,
+  DashboardOutlined as DashboardIcon,
+} from "@mui/icons-material";
 
 // Import the logo
 import ZoneTribeLogo from "../assets/ZoneTribeLogo.png";
+import WalletLogo from "../assets/WalletLogo.png"; // Import the wallet logo
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(true); // Sidebar is open by default
@@ -25,16 +31,18 @@ const Sidebar: React.FC = () => {
       <Drawer
         variant="permanent"
         sx={{
-          width: isOpen ? 200 : 80, // Adjust width for open and collapsed states
+          width: isOpen ? 200 : 50, // Adjust width for open and collapsed states
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: isOpen ? 200 : 80, // Adjust drawer width
+            width: isOpen ? 200 : 50, // Adjust drawer width
             boxSizing: "border-box",
             transition: "width 0.3s ease", // Smooth transition
             height: "100vh", // Full height
             display: "flex",
             flexDirection: "column", // Stack items vertically
             alignItems: "flex-start", // Align items to the left
+            overflow: "hidden", // Prevent overflow
+            borderRight: "1px solid rgba(255, 255, 255, 0.2)", // Add a faint right border
           },
         }}
       >
@@ -63,12 +71,12 @@ const Sidebar: React.FC = () => {
               }}
             >
               <img
-                src={ZoneTribeLogo} // Use the imported logo image
+                src={WalletLogo} // Use the imported logo image
                 alt="Logo"
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: "50%", // Optional: Make the logo circular
+                  width: 60,
+                  height: 60,
+                  //   borderRadius: "50%", // Optional: Make the logo circular
                 }}
               />
             </Box>
@@ -78,15 +86,24 @@ const Sidebar: React.FC = () => {
             sx={{
               position: "absolute", // Position the toggle button
               top: "50%", // Center vertically relative to the box
-              right: "-6px", // Slightly outside the sidebar
+              right: "-12px", // Slightly outside the sidebar
               transform: "translateY(-50%)", // Adjust for perfect centering
-              backgroundColor: "transparent", // Optional: Add a background for better visibility
-              boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)", // Optional: Add a shadow for a floating effect
-                color: "white", // Ensure the icon is visible
-                width: 20,
-              height: 20,
+              backgroundColor: "transparent", // Transparent background
+              boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)", // Add a shadow for better visibility
+              color: "white", // Ensure the icon is visible
+              width: 30, // Adjust the size of the button
+              height: 30, // Adjust the size of the button
+              opacity: 0, // Initially invisible
+              transition: "opacity 0.3s ease", // Smooth transition for opacity
+              pointerEvents: "none", // Prevent interaction when invisible
+              ".MuiDrawer-root:hover &": {
+                opacity: 0.7, // Translucent when hovering over the sidebar
+                pointerEvents: "auto", // Enable interaction when visible
+              },
               "&:hover": {
-                backgroundColor: "#f0f0f0", // Optional: Change background on hover
+                backgroundColor: "rgba(255, 255, 255, 0.2)", // Light background on hover
+                //     opacity: 1, // Fully opaque when hovering over the button
+                //     pointerEvents: "auto", // Ensure interaction is enabled
               },
             }}
           >
@@ -100,17 +117,30 @@ const Sidebar: React.FC = () => {
             component={"a"}
             href="/dashboard"
             sx={{
-              justifyContent: isOpen ? "flex-start" : "center",
+              justifyContent: isOpen ? "flex-start" : "center", // Align items based on sidebar state
               px: isOpen ? 2 : 0, // Add padding when open
             }}
           >
-            <ListItemText
-              primary="Dashboard"
+            <ListItemIcon
               sx={{
-                textAlign: isOpen ? "left" : "center",
-                whiteSpace: "nowrap", // Prevent text wrapping
+                minWidth: 0, // Remove default spacing
+                justifyContent: "center", // Center the icon
+                color: "white", // Set icon color to white
               }}
-            />
+            >
+              <DashboardIcon />
+            </ListItemIcon>
+            {isOpen && (
+              <ListItemText
+                primary="Dashboard"
+                sx={{
+                  textAlign: "left",
+                  marginLeft: 1, // Add margin to the left of the text
+                  whiteSpace: "nowrap", // Prevent text wrapping
+                  color: "white", // Set text color to white
+                }}
+              />
+            )}
           </ListItem>
         </List>
       </Drawer>
