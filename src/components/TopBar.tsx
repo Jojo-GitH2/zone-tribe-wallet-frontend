@@ -1,6 +1,6 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, IconButton, InputBase, Menu, MenuItem } from "@mui/material";
-import { Search, Notifications, AccountCircle, LocalGasStation } from "@mui/icons-material";
+import { Notifications, AccountCircle, LocalGasStation } from "@mui/icons-material";
 
 const TopBar: React.FC = () => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

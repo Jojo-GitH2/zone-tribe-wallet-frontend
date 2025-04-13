@@ -16,7 +16,6 @@ import {
 } from "@mui/icons-material";
 
 // Import the logo
-import ZoneTribeLogo from "../assets/ZoneTribeLogo.png";
 import WalletLogo from "../assets/WalletLogo.png"; // Import the wallet logo
 
 const Sidebar: React.FC = () => {
@@ -36,7 +35,7 @@ const Sidebar: React.FC = () => {
           [`& .MuiDrawer-paper`]: {
             width: isOpen ? 200 : 50, // Adjust drawer width
             boxSizing: "border-box",
-            transition: "width 0.3s ease", // Smooth transition
+            transition: "width 0.3s ease", // Smooth transition for the width
             height: "100vh", // Full height
             display: "flex",
             flexDirection: "column", // Stack items vertically
@@ -55,10 +54,18 @@ const Sidebar: React.FC = () => {
             width: "100%",
             p: 2,
             position: "relative", // Allows absolute positioning of the toggle button
+            transition: "all 0.3s ease", // Smooth transition for child elements
           }}
         >
           {isOpen ? (
-            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+                transition: "opacity 0.3s ease", // Smooth fade-in/out for text
+                opacity: isOpen ? 1 : 0, // Hide text when collapsed
+              }}
+            >
               Zone Tribe Wallet
             </Typography>
           ) : (
@@ -68,6 +75,7 @@ const Sidebar: React.FC = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 width: "100%",
+                transition: "all 0.3s ease", // Smooth transition for logo
               }}
             >
               <img
@@ -76,7 +84,7 @@ const Sidebar: React.FC = () => {
                 style={{
                   width: 60,
                   height: 60,
-                  //   borderRadius: "50%", // Optional: Make the logo circular
+                  transition: "all 0.3s ease", // Smooth transition for logo size
                 }}
               />
             </Box>
@@ -102,8 +110,6 @@ const Sidebar: React.FC = () => {
               },
               "&:hover": {
                 backgroundColor: "rgba(255, 255, 255, 0.2)", // Light background on hover
-                //     opacity: 1, // Fully opaque when hovering over the button
-                //     pointerEvents: "auto", // Ensure interaction is enabled
               },
             }}
           >
@@ -112,13 +118,21 @@ const Sidebar: React.FC = () => {
         </Box>
 
         {/* Sidebar Items */}
-        <List sx={{ flexGrow: 1, mt: 4, width: "100%" }}>
+        <List
+          sx={{
+            flexGrow: 1,
+            mt: 4,
+            width: "100%",
+            transition: "all 0.3s ease", // Smooth transition for list items
+          }}
+        >
           <ListItem
             component={"a"}
             href="/dashboard"
             sx={{
               justifyContent: isOpen ? "flex-start" : "center", // Align items based on sidebar state
               px: isOpen ? 2 : 0, // Add padding when open
+              transition: "all 0.3s ease", // Smooth transition for alignment
             }}
           >
             <ListItemIcon
@@ -126,6 +140,7 @@ const Sidebar: React.FC = () => {
                 minWidth: 0, // Remove default spacing
                 justifyContent: "center", // Center the icon
                 color: "white", // Set icon color to white
+                transition: "all 0.3s ease", // Smooth transition for icon
               }}
             >
               <DashboardIcon />
@@ -138,6 +153,8 @@ const Sidebar: React.FC = () => {
                   marginLeft: 1, // Add margin to the left of the text
                   whiteSpace: "nowrap", // Prevent text wrapping
                   color: "white", // Set text color to white
+                  transition: "opacity 0.3s ease", // Smooth fade-in/out for text
+                  opacity: isOpen ? 1 : 0, // Hide text when collapsed
                 }}
               />
             )}
