@@ -13,9 +13,11 @@ import {
 } from "@mui/material";
 import { createWallet } from "../services/walletService";
 import { AuthContext } from "../context/authContext"; // Import AuthContext to get the userId
+import QRCodeModal from "./QRCodeModal";
 
 const ActionButtons: React.FC = () => {
   const [open, setOpen] = useState(false); // Modal state
+  const [qrModalOpen, setQrModalOpen] = useState(false);
   const [walletName, setWalletName] = useState(""); // Wallet name state
   const [network, setNetwork] = useState("Sepolia"); // Default network is Sepolia
   const [currency, setCurrency] = useState("SepoliaETH"); // Default currency is SepoliaETH
@@ -32,6 +34,16 @@ const ActionButtons: React.FC = () => {
     setWalletAddress("");
     setError("");
   };
+
+  const handleQrModalOpen = (address: string) => {
+    setWalletAddress(address);
+    setQrModalOpen(true);
+  }
+
+  const handleQrModalClose = async () => {
+    setQrModalOpen(false);
+
+  }
 
   const handleCreateWallet = async () => {
     setLoading(true);
@@ -51,7 +63,11 @@ const ActionButtons: React.FC = () => {
         network,
         currency,
       }); // Call the API
-      setWalletAddress(data.walletAddress); // Set the wallet address from the response
+      setWalletAddress(data.address); // Set the wallet address from the response
+      console.log(data);
+      console.log("Wallet created successfully:", data.address);
+      handleClose();
+      handleQrModalOpen(data.address);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -70,24 +86,24 @@ const ActionButtons: React.FC = () => {
     >
       {/* Grouped Action Buttons */}
       <Box sx={{ display: "flex", gap: 2 }}>
-        <Button
+        {/* <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
         >
           Buy
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
         >
           Swap
-        </Button>
-        <Button
+        </Button> */}
+        {/* <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
         >
           Bridge
-        </Button>
+        </Button> */}
         <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
@@ -98,14 +114,14 @@ const ActionButtons: React.FC = () => {
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
         >
-          Sell
+          Receive
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
         >
           Stake
-        </Button>
+        </Button> */}
       </Box>
 
       {/* Add an Account Button */}
@@ -210,6 +226,12 @@ const ActionButtons: React.FC = () => {
           </Button>
         </Box>
       </Modal>
+
+      <QRCodeModal
+        open={qrModalOpen}
+        onClose={handleQrModalClose}
+        walletAddress={walletAddress}
+      />
     </Box>
   );
 };
