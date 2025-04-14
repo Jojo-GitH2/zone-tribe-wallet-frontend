@@ -18,11 +18,17 @@ import {
 // Import the logo
 import WalletLogo from "../assets/WalletLogo.png"; // Import the wallet logo
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  onToggle: (isOpen: boolean) => void; // Callback to notify parent about collapse state
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
   const [isOpen, setIsOpen] = useState(true); // Sidebar is open by default
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+    const newIsOpen = !isOpen;
+    setIsOpen(newIsOpen);
+    onToggle?.(newIsOpen); // Safely call onToggle
   };
 
   return (

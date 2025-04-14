@@ -19,8 +19,8 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
   const handleCopyToClipboard = () => {
     navigator.clipboard.writeText(walletAddress); // Copy the wallet address to clipboard
     setCopied(true); // Show "Copied!" tooltip
-      setTimeout(() => setCopied(false), 3000); // Hide tooltip after 3 seconds
-      console.log("Wallet address copied to clipboard:", walletAddress); // Log the copied address
+    setTimeout(() => setCopied(false), 3000); // Hide tooltip after 3 seconds
+    // console.log("Wallet address copied to clipboard:", walletAddress); // Log the copied address
   };
 
   return (
@@ -31,7 +31,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: '40vw',
+          width: "40vw",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
@@ -49,7 +49,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
           size={200}
           includeMargin
           imageSettings={{
-            src: "/path-to-your-logo.png", // Replace with your logo's path
+            src: "../assets/WalletLogo.png", // Replace with your logo's path
             height: 40,
             width: 40,
             excavate: true,
@@ -64,8 +64,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
             justifyContent: "center",
             mt: 2,
           }}
-              >
-                  
+        >
           <Typography variant="body1" sx={{ mr: 1 }}>
             {walletAddress}
           </Typography>
