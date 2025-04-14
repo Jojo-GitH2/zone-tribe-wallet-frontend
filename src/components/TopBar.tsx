@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   AppBar,
   Toolbar,
@@ -12,12 +12,15 @@ import {
   AccountCircleOutlined,
 } from "@mui/icons-material"; // Use outlined icons
 import WalletDropdown from "./WalletDropdown";
+import { AuthContext } from "../context/authContext";
 
 interface TopBarProps {
   sidebarWidth: number; // Sidebar width to adjust the TopBar width dynamically
 }
 
 const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
+  const authContext = useContext(AuthContext); // Access the userId from AuthContext
+  const userId = authContext?.user?.id; // Get the userId from the context
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -31,7 +34,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
   const handleAddAccount = () => {
     // Logic to add a new account
     console.log("Add Account clicked");
-  }
+  };
 
   return (
     <AppBar
@@ -45,13 +48,14 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
         color: "white", // Set text and icon color to white
         boxShadow: "none", // Remove default AppBar shadow
         transition: "width 0.3s ease, margin-left 0.3s ease", // Smooth transition for width and margin
-        borderBottom: "0.5px solid rgba(255, 255, 255, 0.2)"
+        borderBottom: "0.5px solid rgba(255, 255, 255, 0.2)",
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-    
-        <Box sx={{ flexGrow: 1, textAlign: "center" }} >
-          <WalletDropdown onAddAccount={handleAddAccount} />
+        <Box sx={{ flexGrow: 1, textAlign: "center" }}>
+          {userId && (
+            <WalletDropdown onAddAccount={handleAddAccount} />
+          )}
         </Box>
 
         {/* Right: Notification and Profile */}

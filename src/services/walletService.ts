@@ -19,4 +19,21 @@ export const createWallet = async (input: CreateWalletInput) => {
     }
 };
 
+// Function to fetch wallets for a user
+export const fetchUserWallets = async (token: string) => {
+    try {
+        const response = await api.get(`/wallet/get-wallets`, {
+            headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the request headers
+            },
+        });
+        console.log("Fetched wallets:", response.data); // Log the fetched wallets
+
+        return response.data; // Return the list of wallets
+    } catch (error: any) {
+        console.error("Error fetching wallets:", error.response?.data);
+        throw error.response?.data || "Failed to fetch wallets"; // Handle errors
+    }
+};
+
 // Add other wallet-related functions here in the future

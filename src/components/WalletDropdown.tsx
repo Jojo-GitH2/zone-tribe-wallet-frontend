@@ -8,7 +8,8 @@ import {
   Divider,
   ListItemText,
 } from "@mui/material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"; // Import dropdown icon
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { fetchUserWallets } from "../services/walletService"; // Import the API service
 
 interface Wallet {
   id: string;
@@ -21,31 +22,37 @@ interface WalletDropdownProps {
   onAddAccount: () => void; // Callback for adding a new account
 }
 
-const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
+const WalletDropdown: React.FC<WalletDropdownProps> = ({
+  onAddAccount,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Simulate fetching wallets from the backend
+    useEffect(() => {
+      
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setError("User is not authenticated. Please log in.");
+            setLoading(false)
+            // console.error("No token found in local storage.");
+            return;
+            }
     const fetchWallets = async () => {
-      const data: Wallet[] = [
-        {
-          id: "1",
-          walletName: "Main Wallet",
-          address: "0x1234567890abcdef1234567890abcdef12345678",
-          balance: 10.5,
-        },
-        {
-          id: "2",
-          walletName: "Savings Wallet",
-          address: "0xabcdef1234567890abcdef1234567890abcdef12",
-          balance: 5.0,
-        },
-      ];
-      setWallets(data);
-      if (data.length > 0) {
-        setCurrentWallet(data[0]); // Set the first wallet as the current wallet
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchUserWallets(token); // Fetch wallets from the backend
+        setWallets(data);
+        if (data.length > 0) {
+          setCurrentWallet(data[0]); // Set the first wallet as the current wallet
+        }
+      } catch (err) {
+        setError("Failed to fetch wallets. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -70,15 +77,13 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
       {currentWallet ? (
         <Button
           onClick={handleMenuOpen}
-          endIcon={<ArrowDropDownIcon />} // Add dropdown icon beside the wallet name
+          endIcon={<ArrowDropDownIcon />}
           sx={{
             textTransform: "none",
             fontWeight: "bold",
             color: "white",
             fontSize: "1rem",
             minWidth: "200px",
-            // display: "flex",
-            //   justifyContent: "space-between",
             alignItems: "center",
           }}
         >
@@ -98,20 +103,28 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
         onClose={handleMenuClose}
         sx={{
           "& .MuiPaper-root": {
-            width: "25vw", // Set the width of the dropdown
+            width: "25vw",
             bgcolor: "background.paper",
           },
         }}
         anchorOrigin={{
-          vertical: "bottom", // Align the dropdown to the bottom of the button
-          horizontal: "center", // Center the dropdown horizontally
+          vertical: "bottom",
+          horizontal: "center",
         }}
         transformOrigin={{
-          vertical: "top", // Align the dropdown's top with the button's bottom
-          horizontal: "center", // Center the dropdown horizontally
+          vertical: "top",
+          horizontal: "center",
         }}
       >
-        {wallets.length > 0 ? (
+        {loading ? (
+          <MenuItem>
+            <Typography>Loading...</Typography>
+          </MenuItem>
+        ) : error ? (
+          <MenuItem>
+            <Typography color="error">{error}</Typography>
+          </MenuItem>
+        ) : wallets.length > 0 ? (
           <>
             {wallets.map((wallet) => (
               <MenuItem
@@ -125,10 +138,10 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
                     6
                   )}...${wallet.address.slice(-4)}`}
                   primaryTypographyProps={{
-                    sx: { color: "white" }, // Make the wallet name white
+                    sx: { color: "white" },
                   }}
                   secondaryTypographyProps={{
-                    sx: { color: "rgba(255, 255, 255, 0.7)" }, // Make the wallet address dim
+                    sx: { color: "rgba(255, 255, 255, 0.7)" },
                   }}
                 />
                 <Typography variant="body2" sx={{ ml: 2, color: "white" }}>
