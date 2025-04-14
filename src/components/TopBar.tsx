@@ -2,7 +2,6 @@ import React from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   IconButton,
   Menu,
   MenuItem,
@@ -12,6 +11,7 @@ import {
   NotificationsOutlined,
   AccountCircleOutlined,
 } from "@mui/icons-material"; // Use outlined icons
+import WalletDropdown from "./WalletDropdown";
 
 interface TopBarProps {
   sidebarWidth: number; // Sidebar width to adjust the TopBar width dynamically
@@ -27,6 +27,11 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const handleAddAccount = () => {
+    // Logic to add a new account
+    console.log("Add Account clicked");
+  }
 
   return (
     <AppBar
@@ -44,8 +49,10 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Left: Placeholder for future content */}
-        <Box sx={{ flexGrow: 1 }} />
+    
+        <Box sx={{ flexGrow: 1, textAlign: "center" }} >
+          <WalletDropdown onAddAccount={handleAddAccount} />
+        </Box>
 
         {/* Right: Notification and Profile */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
