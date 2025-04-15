@@ -98,7 +98,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
         onClose={handleMenuClose}
         sx={{
           "& .MuiPaper-root": {
-            width: "25vw",
+            width: "30vw",
             bgcolor: "background.paper",
             display: "flex",
             flexDirection: "column",
@@ -149,7 +149,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
                     }}
                   />
                   <Typography variant="body2" sx={{ ml: 2, color: "white" }}>
-                    {wallet.balance} ETH
+                    {wallet.balance} SepoliaETH
                   </Typography>
                 </MenuItem>
               ))}
