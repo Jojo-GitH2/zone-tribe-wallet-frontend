@@ -165,11 +165,30 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
                 bottom: 0,
                 bgcolor: "background.paper",
                 zIndex: 1,
+                display: "flex",
+                justifyContent: "center", // Center the button horizontally
+                p: 2, // Add padding for spacing
               }}
             >
-              <MenuItem onClick={onAddAccount}>
-                <Typography color="primary">+ Add an account</Typography>
-              </MenuItem>
+              <Button
+                onClick={onAddAccount}
+                variant="outlined"
+                sx={{
+                  borderRadius: "20px",
+                  textTransform: "none",
+                  border: "1px solid white",
+                  backgroundColor: "transparent",
+                  color: "white",
+                  transition: "all 0.7s ease",
+                  "&:hover": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    border: "none",
+                  },
+                }}
+              >
+                + Add an account
+              </Button>
             </Box>
           </>
         ) : (
