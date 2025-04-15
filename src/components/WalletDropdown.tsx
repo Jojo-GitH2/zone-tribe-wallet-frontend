@@ -22,24 +22,21 @@ interface WalletDropdownProps {
   onAddAccount: () => void; // Callback for adding a new account
 }
 
-const WalletDropdown: React.FC<WalletDropdownProps> = ({
-  onAddAccount,
-}) => {
+const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-      
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setError("User is not authenticated. Please log in.");
-            setLoading(false)
-            // console.error("No token found in local storage.");
-            return;
-            }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("User is not authenticated. Please log in.");
+      setLoading(false);
+      // console.error("No token found in local storage.");
+      return;
+    }
     const fetchWallets = async () => {
       setLoading(true);
       setError(null);
@@ -105,6 +102,8 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           "& .MuiPaper-root": {
             width: "25vw",
             bgcolor: "background.paper",
+            display: "flex",
+            flexDirection: "column",
           },
         }}
         anchorOrigin={{
@@ -126,33 +125,52 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           </MenuItem>
         ) : wallets.length > 0 ? (
           <>
-            {wallets.map((wallet) => (
-              <MenuItem
-                key={wallet.id}
-                onClick={() => handleWalletSelect(wallet)}
-              >
-                <ListItemText
-                  primary={wallet.walletName}
-                  secondary={`${wallet.address.slice(
-                    0,
-                    6
-                  )}...${wallet.address.slice(-4)}`}
-                  primaryTypographyProps={{
-                    sx: { color: "white" },
-                  }}
-                  secondaryTypographyProps={{
-                    sx: { color: "rgba(255, 255, 255, 0.7)" },
-                  }}
-                />
-                <Typography variant="body2" sx={{ ml: 2, color: "white" }}>
-                  {wallet.balance} ETH
-                </Typography>
-              </MenuItem>
-            ))}
+            {/* Scrollable Wallet List */}
+            <Box
+              sx={{
+                maxHeight: "40vh", // Limit the height of the wallet list
+                overflowY: "auto", // Enable scrolling for the wallet list
+              }}
+            >
+              {wallets.map((wallet) => (
+                <MenuItem
+                  key={wallet.id}
+                  onClick={() => handleWalletSelect(wallet)}
+                >
+                  <ListItemText
+                    primary={wallet.walletName}
+                    secondary={`${wallet.address.slice(
+                      0,
+                      6
+                    )}...${wallet.address.slice(-4)}`}
+                    primaryTypographyProps={{
+                      sx: { color: "white" },
+                    }}
+                    secondaryTypographyProps={{
+                      sx: { color: "rgba(255, 255, 255, 0.7)" },
+                    }}
+                  />
+                  <Typography variant="body2" sx={{ ml: 2, color: "white" }}>
+                    {wallet.balance} ETH
+                  </Typography>
+                </MenuItem>
+              ))}
+            </Box>
+
+            {/* Fixed "+ Add an account" Button */}
             <Divider />
-            <MenuItem onClick={onAddAccount}>
-              <Typography color="primary">+ Add an account</Typography>
-            </MenuItem>
+            <Box
+              sx={{
+                position: "sticky",
+                bottom: 0,
+                bgcolor: "background.paper",
+                zIndex: 1,
+              }}
+            >
+              <MenuItem onClick={onAddAccount}>
+                <Typography color="primary">+ Add an account</Typography>
+              </MenuItem>
+            </Box>
           </>
         ) : (
           <MenuItem onClick={onAddAccount}>
