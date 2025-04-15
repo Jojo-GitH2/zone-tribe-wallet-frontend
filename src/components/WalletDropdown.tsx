@@ -149,7 +149,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
                     }}
                   />
                   <Typography variant="body2" sx={{ ml: 2, color: "white" }}>
-                    {wallet.balance} SepoliaETH
+                    {wallet.balance} {wallet.currency}
                   </Typography>
                 </MenuItem>
               ))}
