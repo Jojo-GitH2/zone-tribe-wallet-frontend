@@ -182,13 +182,6 @@ const ActionButtons: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Display Wallet Address
-          {walletAddress && (
-            <Typography variant="body1" sx={{ mb: 2, color: "green" }}>
-              Wallet Address: {walletAddress}
-            </Typography>
-          )} */}
-
           {/* Display Error Message */}
           {error && (
             <Typography variant="body1" sx={{ mb: 2, color: "red" }}>
