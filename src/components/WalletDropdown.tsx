@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { fetchUserWallets } from "../services/walletService"; // Import the API service
+import AddAccountButton from "./AddAccountButton"; // Import the reusable component
 
 interface Wallet {
   id: string;
@@ -170,25 +171,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
                 p: 2, // Add padding for spacing
               }}
             >
-              <Button
-                onClick={onAddAccount}
-                variant="outlined"
-                sx={{
-                  borderRadius: "20px",
-                  textTransform: "none",
-                  border: "1px solid white",
-                  backgroundColor: "transparent",
-                  color: "white",
-                  transition: "all 0.7s ease",
-                  "&:hover": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    border: "none",
-                  },
-                }}
-              >
-                + Add an account
-              </Button>
+              <AddAccountButton />
             </Box>
           </>
         ) : (

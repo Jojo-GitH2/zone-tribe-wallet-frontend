@@ -9,14 +9,12 @@ import {
   Select,
   FormControl,
   InputLabel,
-  SelectChangeEvent,
 } from "@mui/material";
 import { createWallet } from "../services/walletService";
 import { AuthContext } from "../context/authContext"; // Import AuthContext to get the userId
 import QRCodeModal from "./QRCodeModal";
-import AddAccountButton from "./AddAccountButton"; // Import the reusable component
 
-const ActionButtons: React.FC = () => {
+const AddAccountButton: React.FC = () => {
   const [open, setOpen] = useState(false); // Modal state
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [walletName, setWalletName] = useState(""); // Wallet name state
@@ -41,7 +39,7 @@ const ActionButtons: React.FC = () => {
     setQrModalOpen(true);
   };
 
-  const handleQrModalClose = async () => {
+  const handleQrModalClose = () => {
     setQrModalOpen(false);
   };
 
@@ -64,7 +62,6 @@ const ActionButtons: React.FC = () => {
         currency,
       }); // Call the API
       setWalletAddress(data.address); // Set the wallet address from the response
-      console.log(data);
       console.log("Wallet created successfully:", data.address);
       handleClose();
       handleQrModalOpen(data.address);
@@ -76,56 +73,27 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        mt: 8,
-      }}
-    >
-      {/* Grouped Action Buttons */}
-      <Box sx={{ display: "flex", gap: 2 }}>
-        {/* <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Buy
-        </Button> */}
-        {/* <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Swap
-        </Button> */}
-        {/* <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Bridge
-        </Button> */}
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Send
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Receive
-        </Button>
-        {/* <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Stake
-        </Button> */}
-      </Box>
-
-      {/* Add an Account Button */}
-      <AddAccountButton />
+    <>
+      {/* "+ Add an account" Button */}
+      <Button
+        variant="outlined"
+        sx={{
+          borderRadius: "20px",
+          textTransform: "none",
+          border: "1px solid white",
+          backgroundColor: "transparent",
+          color: "white",
+          transition: "all 0.7s ease",
+          "&:hover": {
+            backgroundColor: "primary.main",
+            color: "white",
+            border: "none",
+          },
+        }}
+        onClick={handleOpen}
+      >
+        + Add an account
+      </Button>
 
       {/* Modal for Wallet Creation */}
       <Modal open={open} onClose={handleClose}>
@@ -182,13 +150,6 @@ const ActionButtons: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Display Wallet Address
-          {walletAddress && (
-            <Typography variant="body1" sx={{ mb: 2, color: "green" }}>
-              Wallet Address: {walletAddress}
-            </Typography>
-          )} */}
-
           {/* Display Error Message */}
           {error && (
             <Typography variant="body1" sx={{ mb: 2, color: "red" }}>
@@ -209,13 +170,14 @@ const ActionButtons: React.FC = () => {
         </Box>
       </Modal>
 
+      {/* QR Code Modal */}
       <QRCodeModal
         open={qrModalOpen}
         onClose={handleQrModalClose}
         walletAddress={walletAddress}
       />
-    </Box>
+    </>
   );
 };
 
-export default ActionButtons;
+export default AddAccountButton;
