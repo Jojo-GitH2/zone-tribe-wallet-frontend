@@ -13,7 +13,6 @@ import { fetchUserWallets } from "../services/walletService"; // Import the API 
 import AddAccountButton from "./AddAccountButton"; // Import the reusable component
 import { Wallet } from "../types/wallet"; // Import the Wallet type
 
-
 interface WalletDropdownProps {
   onAddAccount: () => void; // Callback for adding a new account
 }
@@ -26,21 +25,24 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("User is not authenticated. Please log in.");
-      setLoading(false);
-      // console.error("No token found in local storage.");
-      return;
-    }
     const fetchWallets = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("User is not authenticated. Please log in.");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       try {
         const data = await fetchUserWallets(token); // Fetch wallets from the backend
-        setWallets(data);
-        if (data.length > 0) {
-          setCurrentWallet(data[0]); // Set the first wallet as the current wallet
+        const sortedWallets = data.sort((a: Wallet, b: Wallet) =>
+          a.walletName.localeCompare(b.walletName)
+        ); // Sort wallets alphabetically by walletName
+        setWallets(sortedWallets);
+        if (sortedWallets.length > 0) {
+          setCurrentWallet(sortedWallets[0]); // Set the first wallet as the current wallet
         }
       } catch (err) {
         setError("Failed to fetch wallets. Please try again.");
