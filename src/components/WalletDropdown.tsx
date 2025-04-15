@@ -11,13 +11,8 @@ import {
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { fetchUserWallets } from "../services/walletService"; // Import the API service
 import AddAccountButton from "./AddAccountButton"; // Import the reusable component
+import { Wallet } from "../types/wallet"; // Import the Wallet type
 
-interface Wallet {
-  id: string;
-  walletName: string;
-  address: string;
-  balance: number;
-}
 
 interface WalletDropdownProps {
   onAddAccount: () => void; // Callback for adding a new account
