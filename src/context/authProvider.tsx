@@ -2,12 +2,9 @@ import React, { useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import { login, register, logout, getToken } from "../services/authService";
 import { AuthContext } from "./authContext";
+import { mapClaimsToUser } from "../utils/mapClaims";
+import { User } from "../types/user";
 
-interface User {
-  id: string;
-  email: string;
-  // Add other fields as per your JWT payload
-}
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -17,15 +14,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const token = getToken();
     if (token) {
-      const decodedUser = jwtDecode<User>(token);
-      setUser(decodedUser);
+      const decodedToken = jwtDecode<any>(token);
+      const mappedUser = mapClaimsToUser(decodedToken);
+      setUser(mappedUser);
     }
   }, []);
 
   const handleLogin = async (email: string, password: string) => {
     const token = await login({ email, password });
-    const decodedUser = jwtDecode<User>(token);
-    setUser(decodedUser);
+    localStorage.setItem("token", token);
+    const decodedToken = jwtDecode<any>(token);
+    const mappedUser = mapClaimsToUser(decodedToken);
+    setUser(mappedUser);
   };
 
   const handleRegister = async (email: string, password: string) => {

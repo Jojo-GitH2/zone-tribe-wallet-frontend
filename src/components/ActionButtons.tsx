@@ -1,13 +1,34 @@
-import React from "react";
-import { Button, Stack, Box } from "@mui/material";
+import React, { useState, useContext } from "react";
+import { Button, Box, Modal, Typography } from "@mui/material";
+import QRCodeModal from "./QRCodeModal";
+import AddAccountButton from "./AddAccountButton";
+import { Wallet } from "../types/wallet";
 
-const ActionButtons: React.FC = () => {
+interface ActionButtonsProps {
+  currentWallet: Wallet | null; // Prop to receive the current wallet
+}
+
+const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
+  const [qrModalOpen, setQrModalOpen] = useState(false);
+
+  const handleQrModalOpen = () => {
+    if (currentWallet) {
+      setQrModalOpen(true); // Open the QRCodeModal
+    } else {
+      alert("Please select a wallet first."); // Notify the user if no wallet is selected
+    }
+  };
+
+  const handleQrModalClose = () => {
+    setQrModalOpen(false); // Close the QRCodeModal
+  };
+
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "space-between", // Pushes the buttons to opposite ends
-        alignItems: "center", // Aligns buttons vertically
+        justifyContent: "space-between",
+        alignItems: "center",
         mt: 8,
       }}
     >
@@ -15,61 +36,28 @@ const ActionButtons: React.FC = () => {
       <Box sx={{ display: "flex", gap: 2 }}>
         <Button
           variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Buy
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Swap
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Bridge
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
+          sx={{ borderRadius: "20px", textTransform: "capitalize" }}
         >
           Send
         </Button>
         <Button
           variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
+          sx={{ borderRadius: "20px", textTransform: "capitalize" }}
+          onClick={handleQrModalOpen} // Open the QRCodeModal for the current wallet
         >
-          Sell
-        </Button>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: "20px", textTransform: "capitalize" }} // Rounded edges and title case
-        >
-          Stake
+          Receive
         </Button>
       </Box>
 
       {/* Add an Account Button */}
-      <Button
-        variant="outlined"
-        sx={{
-          borderRadius: "20px", // Rounded edges
-          textTransform: "none", // Title case
-          border: "1px solid white", // White border
-          backgroundColor: "transparent", // Transparent background
-          color: "white", // White text
-          transition: "all 0.7s ease", // Smooth transition for hover effects
-          "&:hover": {
-            backgroundColor: "primary.main", // Change background color on hover
-            color: "white", // Change text color on hover
-            border: "none", // Remove border on hover
-          },
-        }}
-      >
-        + Add an account
-      </Button>
+      <AddAccountButton />
+
+      {/* QRCodeModal for the Current Wallet */}
+      <QRCodeModal
+        open={qrModalOpen}
+        onClose={handleQrModalClose}
+        walletAddress={currentWallet?.address || ""} // Pass the current wallet's address
+      />
     </Box>
   );
 };
