@@ -25,8 +25,11 @@ const Dashboard: React.FC = () => {
       <Sidebar onToggle={handleSidebarToggle} />
       <Box sx={{ flexGrow: 1, p: 3 }}>
         {/* Pass the dynamic sidebarWidth to the TopBar */}
-        <TopBar sidebarWidth={sidebarWidth} onWalletSelect={handleWalletSelect}/>
-        <ActionButtons />
+        <TopBar
+          sidebarWidth={sidebarWidth}
+          onWalletSelect={handleWalletSelect}
+        />
+        <ActionButtons currentWallet={currentWallet} />
         <WalletSection currentWallet={currentWallet} />
         {/* <TabsSection currentWallet={currentWallet} /> */}
       </Box>

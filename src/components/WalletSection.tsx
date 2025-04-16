@@ -10,9 +10,9 @@ const WalletSection: React.FC<WalletSectionProps> = ({ currentWallet }) => {
   if (!currentWallet) {
     return (
       <div>
-        <Typography variant="h6" sx={{ mt: 4 }}>
+        {/* <Typography variant="h6" sx={{ mt: 4 }}>
           Decentralized Accounts
-        </Typography>
+        </Typography> */}
         <Card sx={{ mt: 2 }}>
           <CardContent>
             <Typography variant="h5"> Create a Wallet</Typography>
@@ -27,9 +27,9 @@ const WalletSection: React.FC<WalletSectionProps> = ({ currentWallet }) => {
   const percentageChange = "+5.23%"; // Example percentage change
   return (
     <div>
-      <Typography variant="h6" sx={{ mt: 4 }}>
+      {/* <Typography variant="h6" sx={{ mt: 4 }}>
         Decentralized Accounts
-      </Typography>
+      </Typography> */}
       <Card sx={{ mt: 2 }}>
         <CardContent>
           <Typography variant="h5">{currentWallet.walletName}</Typography>
