@@ -97,7 +97,8 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           {currentWallet.walletName}
         </Button>
       ) : (
-        <Button
+          <Button
+            endIcon={<ArrowDropDownIcon />}
           onClick={handleMenuOpen}
           sx={{ textTransform: "none", fontWeight: "bold", color: "white" }}
         >
