@@ -15,9 +15,10 @@ import { Wallet } from "../types/wallet"; // Import the Wallet type
 
 interface WalletDropdownProps {
   onAddAccount: () => void; // Callback for adding a new account
+  onWalletSelect: (wallet: Wallet) => void; // Optional callback for wallet selection
 }
 
-const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
+const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount, onWalletSelect }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
@@ -64,6 +65,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
 
   const handleWalletSelect = (wallet: Wallet) => {
     setCurrentWallet(wallet);
+    onWalletSelect(wallet);
     handleMenuClose();
   };
 
@@ -86,10 +88,10 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount }) => {
         </Button>
       ) : (
         <Button
-          onClick={onAddAccount}
+          onClick={handleMenuOpen}
           sx={{ textTransform: "none", fontWeight: "bold", color: "white" }}
         >
-          + Add an account
+          Select Wallet
         </Button>
       )}
       <Menu

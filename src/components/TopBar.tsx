@@ -16,9 +16,10 @@ import { AuthContext } from "../context/authContext";
 
 interface TopBarProps {
   sidebarWidth: number; // Sidebar width to adjust the TopBar width dynamically
+  onWalletSelect: (wallet: any) => void; // Optional callback for wallet selection
 }
 
-const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
+const TopBar: React.FC<TopBarProps> = ({ sidebarWidth, onWalletSelect }) => {
   const authContext = useContext(AuthContext); // Access the userId from AuthContext
   const userId = authContext?.user?.id; // Get the userId from the context
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -54,7 +55,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth }) => {
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ flexGrow: 1, textAlign: "center" }}>
           {userId && (
-            <WalletDropdown onAddAccount={handleAddAccount} />
+            <WalletDropdown onAddAccount={handleAddAccount} onWalletSelect = {onWalletSelect} />
           )}
         </Box>
 

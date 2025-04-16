@@ -5,12 +5,18 @@ import TopBar from "../components/TopBar";
 import ActionButtons from "../components/ActionButtons";
 import WalletSection from "../components/WalletSection";
 import TabsSection from "../components/TabsSection";
+import { Wallet } from "../types/wallet";
 
 const Dashboard: React.FC = () => {
   const [sidebarWidth, setSidebarWidth] = useState(200); // Default sidebar width
+  const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null); // State to hold the current wallet
 
   const handleSidebarToggle = (isOpen: boolean) => {
     setSidebarWidth(isOpen ? 200 : 50); // Adjust width based on collapse state
+  };
+
+  const handleWalletSelect = (wallet: Wallet) => {
+    setCurrentWallet(wallet); // Update the current wallet state
   };
 
   return (
@@ -19,10 +25,10 @@ const Dashboard: React.FC = () => {
       <Sidebar onToggle={handleSidebarToggle} />
       <Box sx={{ flexGrow: 1, p: 3 }}>
         {/* Pass the dynamic sidebarWidth to the TopBar */}
-        <TopBar sidebarWidth={sidebarWidth} />
+        <TopBar sidebarWidth={sidebarWidth} onWalletSelect={handleWalletSelect}/>
         <ActionButtons />
-        <WalletSection />
-        <TabsSection />
+        <WalletSection currentWallet={currentWallet} />
+        {/* <TabsSection currentWallet={currentWallet} /> */}
       </Box>
     </Box>
   );
