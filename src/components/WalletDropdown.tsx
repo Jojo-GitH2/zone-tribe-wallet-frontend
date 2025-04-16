@@ -18,45 +18,55 @@ interface WalletDropdownProps {
   onWalletSelect: (wallet: Wallet) => void; // Optional callback for wallet selection
 }
 
-const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount, onWalletSelect }) => {
+const WalletDropdown: React.FC<WalletDropdownProps> = ({
+  onAddAccount,
+  onWalletSelect,
+}) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reusable fetchWallets function
+  const fetchWallets = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("User is not authenticated. Please log in.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchUserWallets(token); // Fetch wallets from the backend
+      const sortedWallets = data.sort((a: Wallet, b: Wallet) =>
+        a.walletName.localeCompare(b.walletName)
+      ); // Sort wallets alphabetically by walletName
+      setWallets(sortedWallets);
+
+      if (sortedWallets.length > 0 && !currentWallet) {
+        const firstWallet = sortedWallets[0];
+        setCurrentWallet(firstWallet); // Set the first wallet as the current wallet
+        onWalletSelect(firstWallet); // Notify the parent component
+      }
+    } catch (err) {
+      setError("Failed to fetch wallets. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch wallets on component mount
   useEffect(() => {
-    const fetchWallets = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("User is not authenticated. Please log in.");
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchUserWallets(token); // Fetch wallets from the backend
-        const sortedWallets = data.sort((a: Wallet, b: Wallet) =>
-          a.walletName.localeCompare(b.walletName)
-        ); // Sort wallets alphabetically by walletName
-        setWallets(sortedWallets);
-        if (sortedWallets.length > 0) {
-          setCurrentWallet(sortedWallets[0]); // Set the first wallet as the current wallet
-        }
-      } catch (err) {
-        setError("Failed to fetch wallets. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchWallets();
   }, []);
 
+  // Handle dropdown open
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    fetchWallets(); // Re-fetch wallets when the dropdown is opened
   };
 
   const handleMenuClose = () => {
@@ -65,7 +75,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({ onAddAccount, onWalletS
 
   const handleWalletSelect = (wallet: Wallet) => {
     setCurrentWallet(wallet);
-    onWalletSelect(wallet);
+    onWalletSelect(wallet); // Notify the parent component
     handleMenuClose();
   };
 
