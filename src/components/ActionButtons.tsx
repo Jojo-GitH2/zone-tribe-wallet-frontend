@@ -37,13 +37,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
         <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }}
+          disabled={!currentWallet} // Disable if no wallet
         >
           Send
         </Button>
         <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }}
-          onClick={handleQrModalOpen} // Open the QRCodeModal for the current wallet
+          onClick={handleQrModalOpen}
+          disabled={!currentWallet} // Disable if no wallet
         >
           Receive
         </Button>

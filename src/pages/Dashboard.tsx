@@ -31,7 +31,7 @@ const Dashboard: React.FC = () => {
         />
         <ActionButtons currentWallet={currentWallet} />
         <WalletSection currentWallet={currentWallet} />
-        <TabsSection />
+        <TabsSection currentWallet={currentWallet}/>
       </Box>
     </Box>
   );

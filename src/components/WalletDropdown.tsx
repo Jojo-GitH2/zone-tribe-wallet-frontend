@@ -97,8 +97,8 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           {currentWallet.walletName}
         </Button>
       ) : (
-          <Button
-            endIcon={<ArrowDropDownIcon />}
+        <Button
+          endIcon={<ArrowDropDownIcon />}
           onClick={handleMenuOpen}
           sx={{ textTransform: "none", fontWeight: "bold", color: "white" }}
         >
@@ -185,8 +185,18 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
             </Box>
           </>
         ) : (
-          <MenuItem onClick={onAddAccount}>
-            <Typography color="primary">+ Add an account</Typography>
+          <MenuItem
+            sx={{
+              position: "sticky",
+              bottom: 0,
+              bgcolor: "background.paper",
+              zIndex: 1,
+              display: "flex",
+              justifyContent: "center", // Center the button horizontally
+              p: 2, // Add padding for spacing
+            }}
+          >
+            <AddAccountButton />
           </MenuItem>
         )}
       </Menu>
