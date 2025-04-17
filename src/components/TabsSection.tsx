@@ -14,6 +14,7 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import { Wallet } from "../types/wallet"; // Import the Wallet type
 
 interface Transaction {
   id: string;
@@ -22,9 +23,6 @@ interface Transaction {
   type: string; // e.g., "credit" or "debit"
 }
 
-interface Wallet {
-  // Define the Wallet interface here
-}
 
 interface TabsSectionProps {
   currentWallet: Wallet | null; // Prop to receive the current wallet
