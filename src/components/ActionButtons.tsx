@@ -1,7 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Button, Box, Modal, Typography } from "@mui/material";
 import QRCodeModal from "./QRCodeModal";
 import AddAccountButton from "./AddAccountButton";
+import FundWalletModal from "./FundWalletModal";
 import { Wallet } from "../types/wallet";
 
 interface ActionButtonsProps {
@@ -10,6 +11,7 @@ interface ActionButtonsProps {
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
   const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [fundModalOpen, setFundModalOpen] = useState(false);
 
   const handleQrModalOpen = () => {
     if (currentWallet) {
@@ -21,6 +23,18 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
 
   const handleQrModalClose = () => {
     setQrModalOpen(false); // Close the QRCodeModal
+  };
+
+  const handleFundModalOpen = () => {
+    if (currentWallet) {
+      setFundModalOpen(true); // Open the FundWalletModal
+    } else {
+      alert("Please select a wallet first."); // Notify the user if no wallet is selected
+    }
+  };
+
+  const handleFundModalClose = () => {
+    setFundModalOpen(false); // Close the FundWalletModal
   };
 
   return (
@@ -37,6 +51,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
         <Button
           variant="contained"
           sx={{ borderRadius: "20px", textTransform: "capitalize" }}
+          onClick={handleFundModalOpen}
           disabled={!currentWallet} // Disable if no wallet
         >
           Send
@@ -59,6 +74,13 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
         open={qrModalOpen}
         onClose={handleQrModalClose}
         walletAddress={currentWallet?.address || ""} // Pass the current wallet's address
+      />
+
+      {/* FundWalletModal for Sending Funds */}
+      <FundWalletModal
+        open={fundModalOpen}
+        onClose={handleFundModalClose}
+        currentWallet={currentWallet}
       />
     </Box>
   );
