@@ -40,7 +40,7 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
         }}
       >
         <Typography variant="h6" component="h2" gutterBottom>
-          Wallet QR Code
+          Wallet Address
         </Typography>
 
         {/* QR Code */}

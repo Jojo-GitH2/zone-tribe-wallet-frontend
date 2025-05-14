@@ -28,7 +28,6 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Reusable fetchWallets function
   const fetchWallets = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -49,8 +48,18 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
       if (sortedWallets.length > 0 && !currentWallet) {
         const firstWallet = sortedWallets[0];
         setCurrentWallet(firstWallet); // Set the first wallet as the current wallet
-        onWalletSelect(firstWallet); // Notify the parent component
+        onWalletSelect(firstWallet); // Notify the parent component        
       }
+      // Update the current wallet if it exists in the refreshed list
+      // if (currentWallet) {
+      //   const updatedWallet = sortedWallets.find(
+      //     (wallet: { id: string; }) => wallet.id === currentWallet.id
+      //   );
+      // if (updatedWallet) {
+      //     setCurrentWallet(updatedWallet); // Update the current wallet with the latest data
+      //     onWalletSelect(updatedWallet); // Notify the parent component
+      //   }
+      // }
     } catch (err) {
       setError("Failed to fetch wallets. Please try again.");
     } finally {
@@ -58,12 +67,10 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
     }
   };
 
-  // Fetch wallets on component mount
   useEffect(() => {
     fetchWallets();
   }, []);
 
-  // Handle dropdown open
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     fetchWallets(); // Re-fetch wallets when the dropdown is opened
@@ -98,6 +105,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
         </Button>
       ) : (
         <Button
+          endIcon={<ArrowDropDownIcon />}
           onClick={handleMenuOpen}
           sx={{ textTransform: "none", fontWeight: "bold", color: "white" }}
         >
@@ -184,8 +192,18 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
             </Box>
           </>
         ) : (
-          <MenuItem onClick={onAddAccount}>
-            <Typography color="primary">+ Add an account</Typography>
+          <MenuItem
+            sx={{
+              position: "sticky",
+              bottom: 0,
+              bgcolor: "background.paper",
+              zIndex: 1,
+              display: "flex",
+              justifyContent: "center", // Center the button horizontally
+              p: 2, // Add padding for spacing
+            }}
+          >
+            <AddAccountButton />
           </MenuItem>
         )}
       </Menu>

@@ -8,6 +8,7 @@ const theme = createTheme({
         },
         text: {
             primary: "#eaeaea", // Main text color
+            secondary: "#b0b0b0", // Secondary text color (e.g., subtitles)
         },
         primary: {
             main: "#6a0dad", // Accent color for buttons, links, etc.

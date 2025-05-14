@@ -7,6 +7,13 @@ interface CreateWalletInput {
     currency: string; // Currency for the wallet (e.g., ETH, BNB)
 }
 
+interface SendFundsInput {
+    userId: string; // ID of the user sending funds
+    fromAddress: string; // ID of the wallet sending funds
+    toAddress: string; // Address to send funds to
+    amount: number; // Amount to send
+}
+
 
 // Function to create a wallet
 export const createWallet = async (input: CreateWalletInput) => {
@@ -35,5 +42,20 @@ export const fetchUserWallets = async (token: string) => {
         throw error.response?.data || "Failed to fetch wallets"; // Handle errors
     }
 };
+
+export const sendFunds = async (input: SendFundsInput, token: string) => {
+    try {
+        const response = await api.post("/wallet/send-fund", input, {
+            headers: {
+                Authorization: `Bearer ${token}`, // Include the token in the request headers
+            },
+        });
+        return response.data; // Return the response data (e.g., transaction details)
+    } catch (error: any) {
+        console.error("Error sending funds:", error.response?.data);
+        throw error.response?.data || "Failed to send funds"; // Handle errors
+    }
+};
+
 
 // Add other wallet-related functions here in the future

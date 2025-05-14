@@ -10,33 +10,32 @@ const WalletSection: React.FC<WalletSectionProps> = ({ currentWallet }) => {
   if (!currentWallet) {
     return (
       <div>
-        {/* <Typography variant="h6" sx={{ mt: 4 }}>
-          Decentralized Accounts
-        </Typography> */}
         <Card sx={{ mt: 2 }}>
           <CardContent>
-            <Typography variant="h5"> Create a Wallet</Typography>
+            <Typography variant="h5">Demo Wallet</Typography>
+            <Typography variant="h4" color="primary">
+              0.00 Demo
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              ($0.00)
+            </Typography>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Mock data for equivalent in dollars and percentage change
-  const equivalentInDollars = ( 0.01  * 200).toFixed(3); // Example conversion rate
-  const percentageChange = "+5.23%"; // Example percentage change
+  const equivalentInDollars = (currentWallet.balance * 200).toFixed(2); // Example conversion rate
+
   return (
     <div>
-      {/* <Typography variant="h6" sx={{ mt: 4 }}>
-        Decentralized Accounts
-      </Typography> */}
       <Card sx={{ mt: 2 }}>
         <CardContent>
           <Typography variant="h5">{currentWallet.walletName}</Typography>
           <Typography variant="h4" color="primary">
             {currentWallet.balance} {currentWallet.currency}
           </Typography>
-          <Typography variant="body1" color="white" sx={{ mt: 1 }}>
+          <Typography variant="body1" color="text.secondary">
             (${equivalentInDollars})
           </Typography>
         </CardContent>
