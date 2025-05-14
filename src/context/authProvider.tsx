@@ -8,6 +8,7 @@ import { User } from "../types/user";
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
+  // Rehydrate user state from localStorage on app initialization
   useEffect(() => {
     const initializeAuth = async () => {
       const token = getToken();
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               const newDecodedToken = jwtDecode<any>(newAccessToken);
               const mappedUser = mapClaimsToUser(newDecodedToken);
               setUser(mappedUser);
+              localStorage.setItem("user", JSON.stringify(mappedUser)); // Persist user
             } catch (refreshError) {
               console.error("Failed to refresh token:", refreshError);
               handleLogout();
@@ -32,10 +34,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Token is valid, set the user state
             const mappedUser = mapClaimsToUser(decodedToken);
             setUser(mappedUser);
+            localStorage.setItem("user", JSON.stringify(mappedUser)); // Persist user
           }
         } catch (error) {
           console.error("Error decoding token:", error);
           handleLogout();
+        }
+      } else {
+        // Rehydrate user from localStorage if token is missing
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
         }
       }
     };
@@ -48,6 +57,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const decodedToken = jwtDecode<any>(token);
     const mappedUser = mapClaimsToUser(decodedToken);
     setUser(mappedUser);
+    localStorage.setItem("user", JSON.stringify(mappedUser)); // Persist user
   };
 
   const handleRegister = async (email: string, password: string) => {
@@ -57,6 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleLogout = () => {
     logout();
     setUser(null);
+    localStorage.removeItem("user"); // Clear persisted user
   };
 
   return (
