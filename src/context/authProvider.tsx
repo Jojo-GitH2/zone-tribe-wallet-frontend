@@ -1,28 +1,50 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
-import { login, register, logout, getToken } from "../services/authService";
+import { login, register, logout, getToken, refreshAccessToken } from "../services/authService";
 import { AuthContext } from "./authContext";
 import { mapClaimsToUser } from "../utils/mapClaims";
 import { User } from "../types/user";
 
-
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const token = getToken();
-    if (token) {
-      const decodedToken = jwtDecode<any>(token);
-      const mappedUser = mapClaimsToUser(decodedToken);
-      setUser(mappedUser);
-    }
+    const initializeAuth = async () => {
+      const token = getToken();
+      if (token) {
+        try {
+          const decodedToken = jwtDecode<any>(token);
+
+          // Check if the token is expired
+          const currentTime = Date.now() / 1000;
+          if (decodedToken.exp < currentTime) {
+            // Attempt to refresh the token
+            try {
+              const newAccessToken = await refreshAccessToken();
+              const newDecodedToken = jwtDecode<any>(newAccessToken);
+              const mappedUser = mapClaimsToUser(newDecodedToken);
+              setUser(mappedUser);
+            } catch (refreshError) {
+              console.error("Failed to refresh token:", refreshError);
+              handleLogout();
+            }
+          } else {
+            // Token is valid, set the user state
+            const mappedUser = mapClaimsToUser(decodedToken);
+            setUser(mappedUser);
+          }
+        } catch (error) {
+          console.error("Error decoding token:", error);
+          handleLogout();
+        }
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const handleLogin = async (email: string, password: string) => {
     const token = await login({ email, password });
-    localStorage.setItem("token", token);
     const decodedToken = jwtDecode<any>(token);
     const mappedUser = mapClaimsToUser(decodedToken);
     setUser(mappedUser);
