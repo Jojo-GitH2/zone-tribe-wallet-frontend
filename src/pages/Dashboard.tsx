@@ -23,17 +23,19 @@ const Dashboard: React.FC = () => {
     const data = await fetchUserWallets(token);
     setWallets(data);
 
-    // Update currentWallet to the latest info from the refreshed list
     setCurrentWallet((prev) => {
-      if (!prev) return null;
-      const updated: Wallet | undefined = data.find((w: Wallet) => w.id === prev.id);
-      return updated || null;
+      if (prev) {
+        // Try to find the updated wallet by id
+        const updated: Wallet | undefined = data.find((w: Wallet) => w.id === prev.id);
+        return updated || null;
+      }
+      // If no current wallet, set the first wallet as current
+      return data.length > 0 ? data[0] : null;
     });
   };
 
   useEffect(() => {
     refreshWallets();
-    // eslint-disable-next-line
   }, []);
 
   const handleWalletSelect = (wallet: Wallet) => setCurrentWallet(wallet);
