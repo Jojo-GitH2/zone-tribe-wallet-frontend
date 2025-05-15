@@ -48,18 +48,8 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
       if (sortedWallets.length > 0 && !currentWallet) {
         const firstWallet = sortedWallets[0];
         setCurrentWallet(firstWallet); // Set the first wallet as the current wallet
-        onWalletSelect(firstWallet); // Notify the parent component        
+        onWalletSelect(firstWallet); // Notify the parent component
       }
-      // Update the current wallet if it exists in the refreshed list
-      // if (currentWallet) {
-      //   const updatedWallet = sortedWallets.find(
-      //     (wallet: { id: string; }) => wallet.id === currentWallet.id
-      //   );
-      // if (updatedWallet) {
-      //     setCurrentWallet(updatedWallet); // Update the current wallet with the latest data
-      //     onWalletSelect(updatedWallet); // Notify the parent component
-      //   }
-      // }
     } catch (err) {
       setError("Failed to fetch wallets. Please try again.");
     } finally {
@@ -73,7 +63,6 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    fetchWallets(); // Re-fetch wallets when the dropdown is opened
   };
 
   const handleMenuClose = () => {
@@ -142,70 +131,38 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
             <Typography color="error">{error}</Typography>
           </MenuItem>
         ) : wallets.length > 0 ? (
-          <>
-            {/* Scrollable Wallet List */}
-            <Box
-              sx={{
-                maxHeight: "40vh", // Limit the height of the wallet list
-                overflowY: "auto", // Enable scrolling for the wallet list
-              }}
+          wallets.map((wallet) => (
+            <MenuItem
+              key={wallet.id}
+              onClick={() => handleWalletSelect(wallet)}
             >
-              {wallets.map((wallet) => (
-                <MenuItem
-                  key={wallet.id}
-                  onClick={() => handleWalletSelect(wallet)}
-                >
-                  <ListItemText
-                    primary={wallet.walletName}
-                    secondary={`${wallet.address.slice(
-                      0,
-                      6
-                    )}...${wallet.address.slice(-4)}`}
-                    primaryTypographyProps={{
-                      sx: { color: "white" },
-                    }}
-                    secondaryTypographyProps={{
-                      sx: { color: "rgba(255, 255, 255, 0.7)" },
-                    }}
-                  />
-                  <Typography variant="body2" sx={{ ml: 2, color: "white" }}>
-                    {wallet.balance} {wallet.currency}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Box>
-
-            {/* Fixed "+ Add an account" Button */}
-            <Divider />
-            <Box
-              sx={{
-                position: "sticky",
-                bottom: 0,
-                bgcolor: "background.paper",
-                zIndex: 1,
-                display: "flex",
-                justifyContent: "center", // Center the button horizontally
-                p: 2, // Add padding for spacing
-              }}
-            >
-              <AddAccountButton />
-            </Box>
-          </>
+              <ListItemText
+                primary={wallet.walletName}
+                secondary={`${wallet.address.slice(
+                  0,
+                  6
+                )}...${wallet.address.slice(-4)}`}
+              />
+              <Typography variant="body2" sx={{ ml: 2 }}>
+                {wallet.balance} {wallet.currency}
+              </Typography>
+            </MenuItem>
+          ))
         ) : (
-          <MenuItem
-            sx={{
-              position: "sticky",
-              bottom: 0,
-              bgcolor: "background.paper",
-              zIndex: 1,
-              display: "flex",
-              justifyContent: "center", // Center the button horizontally
-              p: 2, // Add padding for spacing
-            }}
-          >
-            <AddAccountButton />
+          <MenuItem>
+            <Typography>No wallets found.</Typography>
           </MenuItem>
         )}
+        <Divider />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            p: 2,
+          }}
+        >
+          <AddAccountButton />
+        </Box>
       </Menu>
     </Box>
   );

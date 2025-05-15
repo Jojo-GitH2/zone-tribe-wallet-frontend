@@ -34,24 +34,24 @@ export const getRefreshToken = () => {
     return localStorage.getItem("refreshToken");
 }
 
-export const refreshAccessToken = async () => {
-    const refreshToken = getRefreshToken();
-    if (!refreshToken) {
-        throw new Error("No refresh token found");
-    }
+// export const refreshAccessToken = async () => {
+//     const refreshToken = getRefreshToken();
+//     if (!refreshToken) {
+//         throw new Error("No refresh token found");
+//     }
 
-    try {
-        const response = await api.post("/auth/refresh-token", { refreshToken });
-        const { accessToken } = response.data;
+//     try {
+//         const response = await api.post("/auth/refresh-token", { refreshToken });
+//         const { accessToken } = response.data;
 
-        // Update the access token in localStorage
-        localStorage.setItem("accessToken", accessToken);
-        return accessToken;
-    } catch (error) {
-        console.error("Failed to refresh access token:", error);
-        throw error;
-    }
-};
+//         // Update the access token in localStorage
+//         localStorage.setItem("accessToken", accessToken);
+//         return accessToken;
+//     } catch (error) {
+//         console.error("Failed to refresh access token:", error);
+//         throw error;
+//     }
+// };
 
 export const logout = () => {
     localStorage.removeItem("accessToken");

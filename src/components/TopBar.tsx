@@ -55,7 +55,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth, onWalletSelect }) => {
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ flexGrow: 1, textAlign: "center" }}>
           {userId && (
-            <WalletDropdown onAddAccount={handleAddAccount} onWalletSelect = {onWalletSelect} />
+            <WalletDropdown onAddAccount={handleAddAccount} onWalletSelect={onWalletSelect} />
           )}
         </Box>
 
