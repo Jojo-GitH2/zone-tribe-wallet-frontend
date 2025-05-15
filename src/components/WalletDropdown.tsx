@@ -7,8 +7,10 @@ import {
   Box,
   Divider,
   ListItemText,
+  IconButton,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import AddAccountButton from "./AddAccountButton"; // Import the reusable component
 import { Wallet } from "../types/wallet"; // Import the Wallet type
 
@@ -115,10 +117,29 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           sx={{
             display: "flex",
             justifyContent: "center",
+            alignItems: "center",
+            gap: 1,
             p: 2,
           }}
         >
           <AddAccountButton />
+          <IconButton
+            aria-label="Refresh wallets"
+            onClick={refreshWallets}
+            size="small"
+            sx={{
+              ml: 1,
+              color: "white", // Make the icon white
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              "&:hover": {
+                bgcolor: "action.hover",
+              },
+            }}
+          >
+            <RefreshIcon fontSize="small" />
+          </IconButton>
         </Box>
       </Menu>
     </Box>

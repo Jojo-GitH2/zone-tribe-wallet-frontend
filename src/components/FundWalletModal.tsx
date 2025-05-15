@@ -53,9 +53,9 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
 
       if (!userId || !token) {
         throw new Error("User is not authenticated.");
-        }
-        
-        console.log("currentWallet:", currentWallet);
+      }
+
+      console.log("currentWallet:", currentWallet);
 
       const response = await sendFunds(
         {
