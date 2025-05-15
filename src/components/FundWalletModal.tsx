@@ -15,12 +15,14 @@ interface FundWalletModalProps {
   open: boolean;
   onClose: () => void;
   currentWallet: Wallet | null; // Current wallet to send funds from
+  refreshWallets: () => void; // Refresh wallets after sending funds
 }
 
 const FundWalletModal: React.FC<FundWalletModalProps> = ({
   open,
   onClose,
   currentWallet,
+  refreshWallets,
 }) => {
   const [amount, setAmount] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
@@ -67,6 +69,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
 
       setSuccess("Transaction successful!");
       console.log("Transaction response:", response);
+      refreshWallets();
     } catch (err: any) {
       setError(err.message || "Transaction failed.");
     } finally {

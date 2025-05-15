@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Menu,
@@ -9,69 +9,34 @@ import {
   ListItemText,
 } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { fetchUserWallets } from "../services/walletService"; // Import the API service
 import AddAccountButton from "./AddAccountButton"; // Import the reusable component
 import { Wallet } from "../types/wallet"; // Import the Wallet type
 
 interface WalletDropdownProps {
-  onAddAccount: () => void; // Callback for adding a new account
-  onWalletSelect: (wallet: Wallet) => void; // Optional callback for wallet selection
+  wallets: Wallet[];
+  currentWallet: Wallet | null;
+  onWalletSelect: (wallet: Wallet) => void;
+  refreshWallets: () => void;
 }
 
 const WalletDropdown: React.FC<WalletDropdownProps> = ({
-  onAddAccount,
+  wallets,
+  currentWallet,
   onWalletSelect,
+  refreshWallets,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchWallets = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("User is not authenticated. Please log in.");
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchUserWallets(token); // Fetch wallets from the backend
-      const sortedWallets = data.sort((a: Wallet, b: Wallet) =>
-        a.walletName.localeCompare(b.walletName)
-      ); // Sort wallets alphabetically by walletName
-      setWallets(sortedWallets);
-
-      if (sortedWallets.length > 0 && !currentWallet) {
-        const firstWallet = sortedWallets[0];
-        setCurrentWallet(firstWallet); // Set the first wallet as the current wallet
-        onWalletSelect(firstWallet); // Notify the parent component
-      }
-    } catch (err) {
-      setError("Failed to fetch wallets. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWallets();
-  }, []);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    // Optionally call refreshWallets() here if you want to refresh on open
+    // refreshWallets();
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  const handleMenuClose = () => setAnchorEl(null);
 
   const handleWalletSelect = (wallet: Wallet) => {
-    setCurrentWallet(wallet);
-    onWalletSelect(wallet); // Notify the parent component
+    onWalletSelect(wallet);
     handleMenuClose();
   };
 
@@ -122,15 +87,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           horizontal: "center",
         }}
       >
-        {loading ? (
-          <MenuItem>
-            <Typography>Loading...</Typography>
-          </MenuItem>
-        ) : error ? (
-          <MenuItem>
-            <Typography color="error">{error}</Typography>
-          </MenuItem>
-        ) : wallets.length > 0 ? (
+        {wallets.length > 0 ? (
           wallets.map((wallet) => (
             <MenuItem
               key={wallet.id}

@@ -13,13 +13,29 @@ import {
 } from "@mui/icons-material"; // Use outlined icons
 import WalletDropdown from "./WalletDropdown";
 import { AuthContext } from "../context/authContext";
+import { Wallet } from "../types/wallet"; // Import the Wallet type
+
+// interface Wallet {
+//   id: string;
+//   name: string;
+//   balance: number;
+// }
 
 interface TopBarProps {
   sidebarWidth: number; // Sidebar width to adjust the TopBar width dynamically
-  onWalletSelect: (wallet: any) => void; // Optional callback for wallet selection
+  wallets: Wallet[];
+  currentWallet: Wallet | null;
+  onWalletSelect: (wallet: Wallet) => void; // Callback for wallet selection
+  refreshWallets: () => void; // Callback to refresh wallets
 }
 
-const TopBar: React.FC<TopBarProps> = ({ sidebarWidth, onWalletSelect }) => {
+const TopBar: React.FC<TopBarProps> = ({
+  sidebarWidth,
+  wallets,
+  currentWallet,
+  onWalletSelect,
+  refreshWallets,
+}) => {
   const authContext = useContext(AuthContext); // Access the userId from AuthContext
   const userId = authContext?.user?.id; // Get the userId from the context
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -55,7 +71,12 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarWidth, onWalletSelect }) => {
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box sx={{ flexGrow: 1, textAlign: "center" }}>
           {userId && (
-            <WalletDropdown onAddAccount={handleAddAccount} onWalletSelect={onWalletSelect} />
+            <WalletDropdown
+              wallets={wallets}
+              currentWallet={currentWallet}
+              onWalletSelect={onWalletSelect}
+              refreshWallets={refreshWallets}
+            />
           )}
         </Box>
 

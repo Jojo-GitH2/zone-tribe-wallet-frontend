@@ -1,23 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import Sidebar from "../components/SideBar";
 import TopBar from "../components/TopBar";
 import ActionButtons from "../components/ActionButtons";
 import WalletSection from "../components/WalletSection";
 import TabsSection from "../components/TabsSection";
+import { fetchUserWallets } from "../services/walletService";
 import { Wallet } from "../types/wallet";
 
 const Dashboard: React.FC = () => {
-  const [sidebarWidth, setSidebarWidth] = useState(200); // Default sidebar width
-  const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null); // State to hold the current wallet
+  const [sidebarWidth, setSidebarWidth] = useState(200);
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
 
   const handleSidebarToggle = (isOpen: boolean) => {
     setSidebarWidth(isOpen ? 200 : 50); // Adjust width based on collapse state
   };
 
-  const handleWalletSelect = (wallet: Wallet) => {
-    setCurrentWallet(wallet); // Update the current wallet state
+  const refreshWallets = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    const data = await fetchUserWallets(token);
+    setWallets(data);
+
+    // Update currentWallet to the latest info from the refreshed list
+    setCurrentWallet((prev) => {
+      if (!prev) return null;
+      const updated: Wallet | undefined = data.find((w: Wallet) => w.id === prev.id);
+      return updated || null;
+    });
   };
+
+  useEffect(() => {
+    refreshWallets();
+    // eslint-disable-next-line
+  }, []);
+
+  const handleWalletSelect = (wallet: Wallet) => setCurrentWallet(wallet);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -25,9 +44,15 @@ const Dashboard: React.FC = () => {
       <Box sx={{ flexGrow: 1, p: 3 }}>
         <TopBar
           sidebarWidth={sidebarWidth}
+          wallets={wallets}
+          currentWallet={currentWallet}
           onWalletSelect={handleWalletSelect}
+          refreshWallets={refreshWallets}
         />
-        <ActionButtons currentWallet={currentWallet} />
+        <ActionButtons
+          currentWallet={currentWallet}
+          refreshWallets={refreshWallets}
+        />
         <WalletSection currentWallet={currentWallet} />
         <TabsSection currentWallet={currentWallet} />
       </Box>

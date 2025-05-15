@@ -7,9 +7,13 @@ import { Wallet } from "../types/wallet";
 
 interface ActionButtonsProps {
   currentWallet: Wallet | null; // Prop to receive the current wallet
+  refreshWallets: () => void; // Prop to refresh wallets
 }
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({
+  currentWallet,
+  refreshWallets,
+}) => {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [fundModalOpen, setFundModalOpen] = useState(false);
 
@@ -81,6 +85,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentWallet }) => {
         open={fundModalOpen}
         onClose={handleFundModalClose}
         currentWallet={currentWallet}
+        refreshWallets={refreshWallets} // Pass the refreshWallets function
       />
     </Box>
   );
