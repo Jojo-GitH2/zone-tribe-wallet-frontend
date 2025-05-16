@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Tabs,
   Tab,
@@ -14,46 +14,83 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
-import { Wallet } from "../types/wallet"; // Import the Wallet type
-
-interface Transaction {
-  id: string;
-  date: string;
-  amount: number;
-  type: string; // e.g., "credit" or "debit"
-}
-
+import { Wallet } from "../types/wallet";
+import {
+  fetchWalletTransactions,
+  Transaction,
+} from "../services/transactionService";
 
 interface TabsSectionProps {
-  currentWallet: Wallet | null; // Prop to receive the current wallet
+  currentWallet: Wallet | null;
 }
 
 const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [value, setValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    { id: "1", date: "2025-04-01", amount: 100, type: "credit" },
-    { id: "2", date: "2025-04-02", amount: -50, type: "debit" },
-    { id: "3", date: "2025-04-03", amount: 200, type: "credit" },
-  ]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    Transaction[]
+  >([]);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!currentWallet) {
+        setTransactions([]);
+        setFilteredTransactions([]);
+        return;
+      }
+      try {
+        const token =
+          localStorage.getItem("token") || localStorage.getItem("accessToken");
+        if (!token) throw new Error("No token found");
+        const data = await fetchWalletTransactions(
+          currentWallet.address,
+          token
+        );
+        console.log("Fetched transactions:", data);
+        setTransactions(data);
+        setFilteredTransactions(data);
+      } catch (error) {
+        setTransactions([]);
+        setFilteredTransactions([]);
+      }
+    };
+    fetchTransactions();
+  }, [currentWallet]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   const handleSearch = () => {
-    const filteredTransactions = transactions.filter(
-      (transaction) =>
-        transaction.id.includes(searchQuery) ||
-        transaction.date.includes(searchQuery) ||
-        transaction.amount.toString().includes(searchQuery)
+    const q = searchQuery.toLowerCase();
+    setFilteredTransactions(
+      transactions.filter(
+        (t) =>
+          t.transactionId.toLowerCase().includes(q) ||
+          t.dateTime.toLowerCase().includes(q) ||
+          t.amount.toString().includes(q)
+      )
     );
-    setTransactions(filteredTransactions);
   };
 
   const handleExport = (format: "csv" | "pdf") => {
-    console.log(`Exporting transactions as ${format}`);
-    // Implement export logic here
+    if (format === "csv") {
+      const header = "ID,Date,Amount,Type,Status\n";
+      const rows = filteredTransactions
+        .map((t) => `${t.transactionId},${t.dateTime},${t.amount},${t.transactionType},${t.status ?? ""}`)
+        .join("\n");
+      const csv = header + rows;
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "transactions.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === "pdf") {
+      window.print(); // For real PDF export, use a library like jsPDF
+    }
   };
 
   return (
@@ -69,9 +106,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: "200px", // Adjust height as needed
+              height: "200px",
               textAlign: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.05)", // Light background for contrast
+              backgroundColor: "rgba(0, 0, 0, 0.05)",
               borderRadius: "8px",
               color: "text.secondary",
             }}
@@ -114,15 +151,17 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                         <TableCell>Date</TableCell>
                         <TableCell>Amount</TableCell>
                         <TableCell>Type</TableCell>
+                        <TableCell>Status</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {transactions.map((transaction) => (
-                        <TableRow key={transaction.id}>
-                          <TableCell>{transaction.id}</TableCell>
-                          <TableCell>{transaction.date}</TableCell>
+                      {filteredTransactions.map((transaction) => (
+                        <TableRow key={transaction.transactionId}>
+                          <TableCell>{transaction.transactionId}</TableCell>
+                          <TableCell>{transaction.dateTime}</TableCell>
                           <TableCell>{transaction.amount}</TableCell>
-                          <TableCell>{transaction.type}</TableCell>
+                          <TableCell>{transaction.transactionType}</TableCell>
+                          <TableCell>{transaction.status ?? ""}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -153,9 +192,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: "200px", // Adjust height as needed
+                  height: "200px",
                   textAlign: "center",
-                  backgroundColor: "rgba(0, 0, 0, 0.05)", // Light background for contrast
+                  backgroundColor: "rgba(0, 0, 0, 0.05)",
                   borderRadius: "8px",
                 }}
               >
