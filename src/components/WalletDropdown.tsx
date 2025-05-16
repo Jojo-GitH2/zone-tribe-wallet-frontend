@@ -75,9 +75,23 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
         sx={{
           "& .MuiPaper-root": {
             width: "30vw",
+            maxHeight: 56 * 5 + 8, // 4 items * item height + some padding
+            overflowY: "auto",
             bgcolor: "background.paper",
             display: "flex",
             flexDirection: "column",
+            p: 0,
+            // Custom scrollbar styles:
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#888",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "transparent",
+            },
           },
         }}
         anchorOrigin={{
@@ -89,32 +103,38 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           horizontal: "center",
         }}
       >
-        {wallets.length > 0 ? (
-          wallets.map((wallet) => (
-            <MenuItem
-              key={wallet.id}
-              onClick={() => handleWalletSelect(wallet)}
-            >
-              <ListItemText
-                primary={wallet.walletName}
-                secondary={`${wallet.address.slice(
-                  0,
-                  6
-                )}...${wallet.address.slice(-4)}`}
-              />
-              <Typography variant="body2" sx={{ ml: 2 }}>
-                {wallet.balance} {wallet.currency}
-              </Typography>
+        <Box sx={{ flex: 1, overflowY: "auto" }}>
+          {wallets.length > 0 ? (
+            wallets.map((wallet) => (
+              <MenuItem
+                key={wallet.id}
+                onClick={() => handleWalletSelect(wallet)}
+              >
+                <ListItemText
+                  primary={wallet.walletName}
+                  secondary={`${wallet.address.slice(
+                    0,
+                    6
+                  )}...${wallet.address.slice(-4)}`}
+                />
+                <Typography variant="body2" sx={{ ml: 2 }}>
+                  {wallet.balance} {wallet.currency}
+                </Typography>
+              </MenuItem>
+            ))
+          ) : (
+            <MenuItem>
+              <Typography>No wallets found.</Typography>
             </MenuItem>
-          ))
-        ) : (
-          <MenuItem>
-            <Typography>No wallets found.</Typography>
-          </MenuItem>
-        )}
+          )}
+        </Box>
         <Divider />
         <Box
           sx={{
+            position: "sticky",
+            bottom: 0,
+            bgcolor: "background.paper",
+            zIndex: 1,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
