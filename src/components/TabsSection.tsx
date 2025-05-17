@@ -24,6 +24,8 @@ import {
   fetchWalletTransactions,
   Transaction,
 } from "../services/transactionService";
+import jsPDF from "jspdf";
+import { applyPlugin } from "jspdf-autotable";
 
 interface TabsSectionProps {
   currentWallet: Wallet | null;
@@ -54,9 +56,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       const rows = filteredTransactions
         .map(
           (t) =>
-            `${t.transactionId},${t.dateTime},${t.amount},${
-              t.transactionType
-            },${t.status ?? ""}`
+            `${t.transactionId},${t.dateTime},${t.amount},${t.transactionType},${t.status ?? ""}`
         )
         .join("\n");
       const csv = header + rows;
@@ -68,7 +68,26 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       a.click();
       URL.revokeObjectURL(url);
     } else if (format === "pdf") {
-      window.print(); // For real PDF export, use a library like jsPDF
+      applyPlugin(jsPDF);
+      const doc = new jsPDF();
+      console.log("PDF generation started");
+      doc.setFontSize(12);
+      doc.text("Transaction History", 14, 16);
+      console.log("PDF title added");
+      (doc as any).autoTable({
+        startY: 22,
+        head: [["ID", "Date", "Amount", "Type", "Status"]],
+        body: filteredTransactions.map((t) => [
+          t.transactionId,
+          t.dateTime,
+          t.amount,
+          t.transactionType,
+          t.status ?? "",
+        ]),
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [22, 160, 133] },
+      });
+      doc.save("transactions.pdf");
     }
     handleExportClose();
   };
