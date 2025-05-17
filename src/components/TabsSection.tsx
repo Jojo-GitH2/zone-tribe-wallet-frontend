@@ -16,6 +16,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Tooltip,
 } from "@mui/material";
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
@@ -56,7 +57,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       const rows = filteredTransactions
         .map(
           (t) =>
-            `${t.transactionId},${t.dateTime},${t.amount},${t.transactionType},${t.status ?? ""}`
+            `${t.transactionId},${t.dateTime},${t.amount},${
+              t.transactionType
+            },${t.status ?? ""}`
         )
         .join("\n");
       const csv = header + rows;
@@ -70,10 +73,8 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     } else if (format === "pdf") {
       applyPlugin(jsPDF);
       const doc = new jsPDF();
-      console.log("PDF generation started");
       doc.setFontSize(12);
       doc.text("Transaction History", 14, 16);
-      console.log("PDF title added");
       (doc as any).autoTable({
         startY: 22,
         head: [["ID", "Date", "Amount", "Type", "Status"]],
@@ -239,7 +240,22 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                       {filteredTransactions.map((transaction) => (
                         <TableRow key={transaction.transactionId}>
                           <TableCell>{transaction.transactionId}</TableCell>
-                          <TableCell>{transaction.dateTime}</TableCell>
+                          <TableCell>
+                            <Tooltip title={transaction.dateTime}>
+                              <span>
+                                {new Date(transaction.dateTime).toLocaleString(
+                                  undefined,
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "2-digit",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  }
+                                )}
+                              </span>
+                            </Tooltip>
+                          </TableCell>
                           <TableCell>{transaction.amount}</TableCell>
                           <TableCell>{transaction.transactionType}</TableCell>
                           <TableCell>{transaction.status ?? ""}</TableCell>
