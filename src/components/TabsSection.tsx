@@ -13,7 +13,12 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
+import RefreshIconOutlined from "@mui/icons-material/Refresh";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import { Wallet } from "../types/wallet";
 import {
   fetchWalletTransactions,
@@ -31,31 +36,56 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
   >([]);
+  const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(
+    null
+  );
+
+  const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
+    setExportAnchorEl(event.currentTarget);
+  };
+
+  const handleExportClose = () => {
+    setExportAnchorEl(null);
+  };
+
+  const handleExport = (format: "csv" | "pdf") => {
+    if (format === "csv") {
+      const header = "ID,Date,Amount,Type,Status\n";
+      const rows = filteredTransactions
+        .map(
+          (t) =>
+            `${t.transactionId},${t.dateTime},${t.amount},${
+              t.transactionType
+            },${t.status ?? ""}`
+        )
+        .join("\n");
+      const csv = header + rows;
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "transactions.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (format === "pdf") {
+      window.print(); // For real PDF export, use a library like jsPDF
+    }
+    handleExportClose();
+  };
+
+  const handleRefresh = async () => {
+    if (!currentWallet) return;
+    const token =
+      localStorage.getItem("token") || localStorage.getItem("accessToken");
+    if (!token) return;
+    const data = await fetchWalletTransactions(currentWallet.address, token);
+    setTransactions(data);
+    setFilteredTransactions(data);
+  };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      if (!currentWallet) {
-        setTransactions([]);
-        setFilteredTransactions([]);
-        return;
-      }
-      try {
-        const token =
-          localStorage.getItem("token") || localStorage.getItem("accessToken");
-        if (!token) throw new Error("No token found");
-        const data = await fetchWalletTransactions(
-          currentWallet.address,
-          token
-        );
-        console.log("Fetched transactions:", data);
-        setTransactions(data);
-        setFilteredTransactions(data);
-      } catch (error) {
-        setTransactions([]);
-        setFilteredTransactions([]);
-      }
-    };
-    fetchTransactions();
+    handleRefresh();
+    // eslint-disable-next-line
   }, [currentWallet]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -72,25 +102,6 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
           t.amount.toString().includes(q)
       )
     );
-  };
-
-  const handleExport = (format: "csv" | "pdf") => {
-    if (format === "csv") {
-      const header = "ID,Date,Amount,Type,Status\n";
-      const rows = filteredTransactions
-        .map((t) => `${t.transactionId},${t.dateTime},${t.amount},${t.transactionType},${t.status ?? ""}`)
-        .join("\n");
-      const csv = header + rows;
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "transactions.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    } else if (format === "pdf") {
-      window.print(); // For real PDF export, use a library like jsPDF
-    }
   };
 
   return (
@@ -124,22 +135,73 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
           <Box>
             {currentWallet ? (
               <>
-                {/* Search Bar */}
-                <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                {/* Search, Refresh, and Export Row */}
+                <Box
+                  sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center" }}
+                >
                   <TextField
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "20px",
+                      },
+                    }}
                     label="Search by date, amount, or ID"
                     variant="outlined"
                     fullWidth
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSearch();
+                      }
+                    }}
                   />
                   <Button
                     variant="contained"
                     onClick={handleSearch}
-                    sx={{ textTransform: "capitalize" }}
+                    sx={{
+                      textTransform: "capitalize",
+                      borderRadius: "20px",
+                    }}
                   >
                     Search
                   </Button>
+                  <IconButton
+                    aria-label="Export"
+                    onClick={handleExportClick}
+                    sx={{
+                      color: "white",
+                      bgcolor: "transparent",
+                      borderRadius: "20px",
+                      "&:hover": {
+                        bgcolor: "primary.dark",
+                      },
+                    }}
+                  >
+                    <FileDownloadOutlinedIcon />
+                  </IconButton>
+                  <Menu
+                    anchorEl={exportAnchorEl}
+                    open={Boolean(exportAnchorEl)}
+                    onClose={handleExportClose}
+                  >
+                    <MenuItem onClick={() => handleExport("csv")}>CSV</MenuItem>
+                    <MenuItem onClick={() => handleExport("pdf")}>PDF</MenuItem>
+                  </Menu>
+                  <IconButton
+                    aria-label="Refresh"
+                    onClick={handleRefresh}
+                    sx={{
+                      color: "white",
+                      bgcolor: "transparent",
+                      borderRadius: "20px",
+                      "&:hover": {
+                        bgcolor: "primary.dark",
+                      },
+                    }}
+                  >
+                    <RefreshIconOutlined />
+                  </IconButton>
                 </Box>
 
                 {/* Transaction Table */}
@@ -167,24 +229,6 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                     </TableBody>
                   </Table>
                 </TableContainer>
-
-                {/* Export Buttons */}
-                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleExport("csv")}
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    Export as CSV
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleExport("pdf")}
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    Export as PDF
-                  </Button>
-                </Box>
               </>
             ) : (
               <Box
