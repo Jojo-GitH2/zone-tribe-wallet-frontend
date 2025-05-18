@@ -48,10 +48,6 @@ const TopBar: React.FC<TopBarProps> = ({
     setAnchorEl(null);
   };
 
-  const handleAddAccount = () => {
-    // Logic to add a new account
-    console.log("Add Account clicked");
-  };
 
   return (
     <AppBar

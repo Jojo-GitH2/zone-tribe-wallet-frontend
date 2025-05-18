@@ -19,7 +19,7 @@ const AddAccountButton: React.FC = () => {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [walletName, setWalletName] = useState(""); // Wallet name state
   const [network, setNetwork] = useState("Sepolia"); // Default network is Sepolia
-  const [currency, setCurrency] = useState("SepoliaETH"); // Default currency is SepoliaETH
+  const [currency] = useState("SepoliaETH"); // Default currency is SepoliaETH
   const [walletAddress, setWalletAddress] = useState(""); // Wallet address after creation
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(""); // Error state

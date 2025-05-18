@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Box, Modal, Typography } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import QRCodeModal from "./QRCodeModal";
 import AddAccountButton from "./AddAccountButton";
 import FundWalletModal from "./FundWalletModal";

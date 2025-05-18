@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:5063/api", // Fallback to localhost if not defined
+    baseURL: import.meta.env.VITE_API_URL, // Use Vite env variable
     headers: {
         "Content-Type": "application/json",
     },

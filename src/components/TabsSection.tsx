@@ -28,7 +28,7 @@ import {
 import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
 import WalletLogo from "../assets/WalletLogo.jpg";
-import { DomainVerification } from "@mui/icons-material";
+
 interface TabsSectionProps {
   currentWallet: Wallet | null;
 }
@@ -115,7 +115,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     // eslint-disable-next-line
   }, [currentWallet]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
