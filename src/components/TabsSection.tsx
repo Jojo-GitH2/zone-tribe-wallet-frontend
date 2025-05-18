@@ -27,7 +27,8 @@ import {
 } from "../services/transactionService";
 import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
-
+import WalletLogo from "../assets/WalletLogo.jpg"; 
+import { DomainVerification } from "@mui/icons-material";
 interface TabsSectionProps {
   currentWallet: Wallet | null;
 }
@@ -73,8 +74,19 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     } else if (format === "pdf") {
       applyPlugin(jsPDF);
       const doc = new jsPDF();
+      doc.addImage(
+        WalletLogo,
+        "JPEG",
+        14,
+        2,
+        10,
+        10
+      );
+      doc.setFontSize(8);
+      doc.text("Exported on " + new Date().toLocaleString(), 200, 5, { align: "right" });
+
       doc.setFontSize(12);
-      doc.text("Transaction History", 14, 16);
+      doc.text("Transaction History", 14, 20);
       (doc as any).autoTable({
         startY: 22,
         head: [["ID", "Date", "Amount", "Type", "Status"]],
@@ -86,7 +98,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
           t.status ?? "",
         ]),
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [22, 160, 133] },
+        headStyles: { fillColor: "#2c003e" },
       });
       doc.save("transactions.pdf");
     }
