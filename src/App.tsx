@@ -5,9 +5,9 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import PrivateRoute from "./components/privateRoute";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
 
 const App: React.FC = () => {
-
   return (
     <AuthProvider>
       <Routes>
@@ -21,6 +21,7 @@ const App: React.FC = () => {
             </PrivateRoute>
           }
         />
+        <Route path="/" element={<Landing />} />
       </Routes>
     </AuthProvider>
   );
