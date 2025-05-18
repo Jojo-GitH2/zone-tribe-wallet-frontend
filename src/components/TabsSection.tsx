@@ -27,7 +27,7 @@ import {
 } from "../services/transactionService";
 import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
-import WalletLogo from "../assets/WalletLogo.jpg"; 
+import WalletLogo from "../assets/WalletLogo.jpg";
 import { DomainVerification } from "@mui/icons-material";
 interface TabsSectionProps {
   currentWallet: Wallet | null;
@@ -58,9 +58,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       const rows = filteredTransactions
         .map(
           (t) =>
-            `${t.transactionId},${t.dateTime},${t.amount},${
-              t.transactionType
-            },${t.status ?? ""}`
+            `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${t.dateTime})",${t.amount},${t.transactionType},${t.status ?? ""}`
         )
         .join("\n");
       const csv = header + rows;
@@ -74,16 +72,11 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     } else if (format === "pdf") {
       applyPlugin(jsPDF);
       const doc = new jsPDF();
-      doc.addImage(
-        WalletLogo,
-        "JPEG",
-        14,
-        2,
-        10,
-        10
-      );
+      doc.addImage(WalletLogo, "JPEG", 14, 2, 10, 10);
       doc.setFontSize(8);
-      doc.text("Exported on " + new Date().toLocaleString(), 200, 5, { align: "right" });
+      doc.text("Exported on " + new Date().toLocaleString(), 200, 5, {
+        align: "right",
+      });
 
       doc.setFontSize(12);
       doc.text("Transaction History", 14, 20);
@@ -92,7 +85,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
         head: [["ID", "Date", "Amount", "Type", "Status"]],
         body: filteredTransactions.map((t) => [
           t.transactionId,
-          t.dateTime,
+          new Date(t.dateTime).toLocaleString(),
           t.amount,
           t.transactionType,
           t.status ?? "",
