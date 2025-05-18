@@ -83,11 +83,11 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
             p: 0,
             // Custom scrollbar styles:
             "&::-webkit-scrollbar": {
-              width: "6px",
+              width: "2px",
             },
             "&::-webkit-scrollbar-thumb": {
               backgroundColor: "#888",
-              borderRadius: "4px",
+              borderRadius: "2px",
             },
             "&::-webkit-scrollbar-track": {
               backgroundColor: "transparent",

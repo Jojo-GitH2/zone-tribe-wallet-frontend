@@ -58,7 +58,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       const rows = filteredTransactions
         .map(
           (t) =>
-            `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${t.dateTime})",${t.amount},${t.transactionType},${t.status ?? ""}`
+            `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${
+              t.dateTime
+            })",${t.amount},${t.transactionType},${t.status ?? ""}`
         )
         .join("\n");
       const csv = header + rows;
@@ -131,165 +133,206 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Tabs value={value} onChange={handleChange}>
-        <Tab label="Tokens" />
-        <Tab label="Transactions" />
-      </Tabs>
-      <Box sx={{ mt: 2 }}>
-        {value === 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "200px",
-              textAlign: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.05)",
-              borderRadius: "8px",
-              color: "text.secondary",
-            }}
-          >
-            <Typography variant="h6" color="textSecondary">
-              {currentWallet
-                ? "Tokens Content"
-                : "Tokens will appear here once you create a wallet."}
-            </Typography>
-          </Box>
-        )}
+      {/* Sticky header: Tabs and search/export/refresh row */}
+      <Box
+        sx={{
+          position: "sticky",
+          top: 20, // Adjust if your TopBar is a different height
+          zIndex: 10,
+          bgcolor: "background.default",
+          pb: 2,
+          // borderTop: "0.5px solid rgba(255, 255, 255, 0.2)", // Add a faint right border
+        }}
+      >
+        <Tabs value={value} onChange={handleChange}>
+          <Tab label="Tokens" />
+          <Tab label="Transactions" />
+        </Tabs>
         {value === 1 && (
-          <Box>
-            {currentWallet ? (
-              <>
-                {/* Search, Refresh, and Export Row */}
-                <Box
-                  sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center" }}
-                >
-                  <TextField
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "20px",
-                      },
-                    }}
-                    label="Search by date, amount, or ID"
-                    variant="outlined"
-                    fullWidth
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleSearch();
-                      }
-                    }}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={handleSearch}
-                    sx={{
-                      textTransform: "capitalize",
-                      borderRadius: "20px",
-                    }}
-                  >
-                    Search
-                  </Button>
-                  <IconButton
-                    aria-label="Export"
-                    onClick={handleExportClick}
-                    sx={{
-                      color: "white",
-                      bgcolor: "transparent",
-                      borderRadius: "20px",
-                      "&:hover": {
-                        bgcolor: "primary.dark",
-                      },
-                    }}
-                  >
-                    <FileDownloadOutlinedIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={exportAnchorEl}
-                    open={Boolean(exportAnchorEl)}
-                    onClose={handleExportClose}
-                  >
-                    <MenuItem onClick={() => handleExport("csv")}>CSV</MenuItem>
-                    <MenuItem onClick={() => handleExport("pdf")}>PDF</MenuItem>
-                  </Menu>
-                  <IconButton
-                    aria-label="Refresh"
-                    onClick={handleRefresh}
-                    sx={{
-                      color: "white",
-                      bgcolor: "transparent",
-                      borderRadius: "20px",
-                      "&:hover": {
-                        bgcolor: "primary.dark",
-                      },
-                    }}
-                  >
-                    <RefreshIconOutlined />
-                  </IconButton>
-                </Box>
-
-                {/* Transaction Table */}
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Amount</TableCell>
-                        <TableCell>Type</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {filteredTransactions.map((transaction) => (
-                        <TableRow key={transaction.transactionId}>
-                          <TableCell>{transaction.transactionId}</TableCell>
-                          <TableCell>
-                            <Tooltip title={transaction.dateTime}>
-                              <span>
-                                {new Date(transaction.dateTime).toLocaleString(
-                                  undefined,
-                                  {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "2-digit",
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                              </span>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell>{transaction.amount}</TableCell>
-                          <TableCell>{transaction.transactionType}</TableCell>
-                          <TableCell>{transaction.status ?? ""}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </>
-            ) : (
+          <Box sx={{ mt: 2 }}>
+            {currentWallet && (
               <Box
                 sx={{
                   display: "flex",
-                  justifyContent: "center",
+                  gap: 2,
+                  mb: 2,
                   alignItems: "center",
-                  height: "200px",
-                  textAlign: "center",
-                  backgroundColor: "rgba(0, 0, 0, 0.05)",
-                  borderRadius: "8px",
+                  bgcolor: "background.default",
                 }}
               >
-                <Typography variant="h6" color="textSecondary">
-                  Transactions will appear here once you create a wallet.
-                </Typography>
+                {/* Search, Refresh, and Export Row */}
+                <TextField
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "20px",
+                      backgroundColor: "background.paper",
+                    },
+                  }}
+                  label="Search by date, amount, or ID"
+                  variant="outlined"
+                  fullWidth
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearch();
+                    }
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleSearch}
+                  sx={{
+                    textTransform: "capitalize",
+                    borderRadius: "20px",
+                  }}
+                >
+                  Search
+                </Button>
+                <IconButton
+                  aria-label="Export"
+                  onClick={handleExportClick}
+                  sx={{
+                    color: "white",
+                    bgcolor: "transparent",
+                    borderRadius: "20px",
+                    "&:hover": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
+                >
+                  <FileDownloadOutlinedIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={exportAnchorEl}
+                  open={Boolean(exportAnchorEl)}
+                  onClose={handleExportClose}
+                >
+                  <MenuItem onClick={() => handleExport("csv")}>CSV</MenuItem>
+                  <MenuItem onClick={() => handleExport("pdf")}>PDF</MenuItem>
+                </Menu>
+                <IconButton
+                  aria-label="Refresh"
+                  onClick={handleRefresh}
+                  sx={{
+                    color: "white",
+                    bgcolor: "transparent",
+                    borderRadius: "20px",
+                    "&:hover": {
+                      bgcolor: "primary.dark",
+                    },
+                  }}
+                >
+                  <RefreshIconOutlined />
+                </IconButton>
               </Box>
             )}
           </Box>
         )}
       </Box>
+
+      {/* Scrollable transaction table */}
+      {value === 1 && currentWallet && (
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: "60vh",
+            overflowY: "auto",
+            mt: 0,
+            // Hide scrollbar by default, show on hover
+            "&::-webkit-scrollbar": {
+              width: 0,
+              transition: "width 0.7s",
+            },
+            "&:hover::-webkit-scrollbar": {
+              width: "2px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#888",
+              borderRadius: "2px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "transparent",
+            },
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Amount</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Status</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredTransactions.map((transaction) => (
+                <TableRow key={transaction.transactionId}>
+                  <TableCell>{transaction.transactionId}</TableCell>
+                  <TableCell>
+                    <Tooltip title={transaction.dateTime}>
+                      <span>
+                        {new Date(transaction.dateTime).toLocaleString(
+                          undefined,
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </span>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell>{transaction.amount}</TableCell>
+                  <TableCell>{transaction.transactionType}</TableCell>
+                  <TableCell>{transaction.status ?? ""}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {value === 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+            textAlign: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderRadius: "8px",
+            color: "text.secondary",
+          }}
+        >
+          <Typography variant="h6" color="textSecondary">
+            {currentWallet
+              ? "Tokens Content"
+              : "Tokens will appear here once you create a wallet."}
+          </Typography>
+        </Box>
+      )}
+      {value === 1 && !currentWallet && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+            textAlign: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderRadius: "8px",
+          }}
+        >
+          <Typography variant="h6" color="textSecondary">
+            Transactions will appear here once you create a wallet.
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 };

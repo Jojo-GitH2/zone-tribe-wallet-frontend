@@ -36,7 +36,7 @@ const WalletSection: React.FC<WalletSectionProps> = ({ currentWallet }) => {
 
   return (
     <div>
-      <Card sx={{ mt: 2 }}>
+      <Card sx={{ mt: 2}}>
         <CardContent>
           <Typography variant="h5">{currentWallet.walletName}</Typography>
           <Typography variant="h4" color="primary">
