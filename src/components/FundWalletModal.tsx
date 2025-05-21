@@ -49,7 +49,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
 
     try {
       const userId = authContext?.user?.id; // Get the userId from the context
-      const token = localStorage.getItem("token"); // Get the token from localStorage
+      const token = localStorage.getItem("accessToken"); // Get the token from localStorage
 
       if (!userId || !token) {
         throw new Error("User is not authenticated.");
