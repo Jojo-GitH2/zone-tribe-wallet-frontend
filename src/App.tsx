@@ -22,6 +22,7 @@ const App: React.FC = () => {
           }
         />
         <Route path="/" element={<Landing />} />
+        <Route path="*" element={<Login />} />
       </Routes>
     </AuthProvider>
   );

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL, // Use Vite env variable
+    baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api", // Use Vite env variable
     headers: {
         "Content-Type": "application/json",
     },
@@ -42,7 +42,7 @@ api.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
                 return api(originalRequest);
-            } catch (err) {     
+            } catch (err) {
                 console.error("Failed to refresh access token:", err);
                 throw err;
             }

@@ -102,8 +102,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
 
   const handleRefresh = async () => {
     if (!currentWallet) return;
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
     if (!token) return;
     const data = await fetchWalletTransactions(currentWallet.address, token);
     setTransactions(data);
