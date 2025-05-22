@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -39,6 +40,7 @@ const TopBar: React.FC<TopBarProps> = ({
   const authContext = useContext(AuthContext); // Access the userId from AuthContext
   const userId = authContext?.user?.id; // Get the userId from the context
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const navigate = useNavigate();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -48,6 +50,14 @@ const TopBar: React.FC<TopBarProps> = ({
     setAnchorEl(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    if (authContext?.logout) {
+      authContext.logout();
+    }
+    handleMenuClose();
+    navigate("/login");
+  };
 
   return (
     <AppBar
@@ -107,7 +117,7 @@ const TopBar: React.FC<TopBarProps> = ({
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Accounts</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
+            <MenuItem onClick={handleLogout}>Log out</MenuItem>
           </Menu>
         </Box>
       </Toolbar>
