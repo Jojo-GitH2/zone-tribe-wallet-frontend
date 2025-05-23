@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Pagination,
 } from "@mui/material";
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
@@ -37,12 +38,15 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [value, setValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<
-    Transaction[]
-  >([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(
+    []
+  );
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(
     null
   );
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(30);
+  const [totalCount, setTotalCount] = useState(0);
 
   const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
     setExportAnchorEl(event.currentTarget);
@@ -100,19 +104,38 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     handleExportClose();
   };
 
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
+  };
+
   const handleRefresh = async () => {
+    console.log("Current Wallet ", currentWallet);
+    console.log("Page ", page);
+    console.log("Page Size ", pageSize);
     if (!currentWallet) return;
     const token = localStorage.getItem("accessToken");
     if (!token) return;
-    const data = await fetchWalletTransactions(currentWallet.address, token);
-    setTransactions(data);
-    setFilteredTransactions(data);
+    const data = await fetchWalletTransactions(
+      currentWallet.address,
+      token,
+      page,
+      pageSize
+    );
+    setTransactions(data.items);
+    setFilteredTransactions(data.items);
+    console.log("Filtered Transactions ", filteredTransactions);
+
+    setTotalCount(data.totalCount);
+    console.log("Total Count ", totalCount);
   };
 
   useEffect(() => {
     handleRefresh();
     // eslint-disable-next-line
-  }, [currentWallet]);
+  }, [currentWallet, page]);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -266,7 +289,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredTransactions.map((transaction) => (
+              {(filteredTransactions || []).map((transaction) => (
                 <TableRow key={transaction.transactionId}>
                   <TableCell>{transaction.transactionId}</TableCell>
                   <TableCell>
@@ -293,6 +316,14 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
             </TableBody>
           </Table>
         </TableContainer>
+      )}
+      {value === 1 && currentWallet && (
+        <Pagination
+          count={Math.ceil(totalCount / pageSize)}
+          page={page}
+          onChange={handlePageChange}
+          sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+        />
       )}
 
       {value === 0 && (

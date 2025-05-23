@@ -9,14 +9,30 @@ export interface Transaction {
   // Add other fields as needed
 }
 
+export interface PaginatedTransactions {
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  items: Transaction[];
+}
+
 // Fetch transactions for a wallet
-export const fetchWalletTransactions = async (walletAddress: string, token: string): Promise<Transaction[]> => {
+export const fetchWalletTransactions = async (
+  walletAddress: string,
+  token: string,
+  page: number = 1,
+  pageSize: number = 30
+): Promise<PaginatedTransactions> => {
   try {
-    const response = await api.get(`/Wallet/transactions/${walletAddress}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await api.get(
+      `/Wallet/transactions/${walletAddress}?pageNumber=${page}&pageSize=${pageSize}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("Fetched transactions:", response.data);
     return response.data;
   } catch (error: any) {
     console.error("Error fetching transactions:", error.response?.data);
