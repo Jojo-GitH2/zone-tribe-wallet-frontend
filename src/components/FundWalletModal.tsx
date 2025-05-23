@@ -68,6 +68,8 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
       );
 
       setSuccess("Transaction successful!");
+      setAmount(""); // Clear amount field
+      setRecipientAddress(""); // Clear recipient address field
       console.log("Transaction response:", response);
       refreshWallets();
     } catch (err: any) {
