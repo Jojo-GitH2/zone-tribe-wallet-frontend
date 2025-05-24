@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { Wallet } from "../types/wallet";
 import {
   fetchWalletTransactions,
@@ -221,7 +222,11 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                       handleSearch();
                     }
                   }}
+                  placeholder='e.g. "2025-05-21", "0.001", or part of transaction ID'
                 />
+                <Tooltip title='Search by date (YYYY-MM-DD), amount (e.g. 0.001), or transaction ID'>
+                  <InfoOutlinedIcon color="action" sx={{ ml: 1, cursor: "pointer", color: "text.secondary"}} />
+                </Tooltip>
                 <Button
                   variant="contained"
                   onClick={handleSearch}
