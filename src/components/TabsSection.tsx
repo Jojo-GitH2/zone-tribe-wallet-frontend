@@ -25,6 +25,7 @@ import { Wallet } from "../types/wallet";
 import {
   fetchWalletTransactions,
   Transaction,
+  fetchAllWalletTransactions,
 } from "../services/transactionService";
 import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
@@ -45,7 +46,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     null
   );
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(30);
+  const [pageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
 
   const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -56,10 +57,14 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     setExportAnchorEl(null);
   };
 
-  const handleExport = (format: "csv" | "pdf") => {
+  const handleExport = async (format: "csv" | "pdf") => {
+    const token = localStorage.getItem("accessToken");
+    if (!currentWallet || !token) return;
+    const allTransactions = await fetchAllWalletTransactions(currentWallet.address, token);
+
     if (format === "csv") {
       const header = "ID,Date,Amount,Type,Status\n";
-      const rows = filteredTransactions
+      const rows = allTransactions
         .map(
           (t) =>
             `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${
@@ -89,7 +94,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       (doc as any).autoTable({
         startY: 22,
         head: [["ID", "Date", "Amount", "Type", "Status"]],
-        body: filteredTransactions.map((t) => [
+        body: allTransactions.map((t) => [
           t.transactionId,
           new Date(t.dateTime).toLocaleString(),
           t.amount,
@@ -112,9 +117,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   };
 
   const handleRefresh = async () => {
-    console.log("Current Wallet ", currentWallet);
-    console.log("Page ", page);
-    console.log("Page Size ", pageSize);
+    // console.log("Current Wallet ", currentWallet);
+    // console.log("Page ", page);
+    // console.log("Page Size ", pageSize);
     if (!currentWallet) return;
     const token = localStorage.getItem("accessToken");
     if (!token) return;
@@ -126,10 +131,10 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     );
     setTransactions(data.items);
     setFilteredTransactions(data.items);
-    console.log("Filtered Transactions ", filteredTransactions);
+    // console.log("Filtered Transactions ", filteredTransactions);
 
     setTotalCount(data.totalCount);
-    console.log("Total Count ", totalCount);
+    // console.log("Total Count ", totalCount);
   };
 
   useEffect(() => {

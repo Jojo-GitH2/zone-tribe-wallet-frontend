@@ -21,15 +21,16 @@ const Dashboard: React.FC = () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
     const data = await fetchUserWallets(token);
+    // console.log("Fetched wallets - Dashboard:", data);
     setWallets(data);
+    // console.log("Wallets after refresh:", data);
 
     setCurrentWallet((prev) => {
       if (prev) {
-        // Try to find the updated wallet by id
-        const updated: Wallet | undefined = data.find((w: Wallet) => w.id === prev.id);
-        return updated || null;
+        const updated = data.find((w: { id: string; }) => w.id === prev.id);
+        // Always return a new object reference if found, or fallback to first wallet
+        return updated ? { ...updated } : (data.length > 0 ? data[0] : null);
       }
-      // If no current wallet, set the first wallet as current
       return data.length > 0 ? data[0] : null;
     });
   };

@@ -55,7 +55,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         throw new Error("User is not authenticated.");
       }
 
-      console.log("currentWallet:", currentWallet);
+      // console.log("currentWallet:", currentWallet);
 
       const response = await sendFunds(
         {
@@ -67,11 +67,21 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         token
       );
 
+
+      // setTimeout(() => {
+      //   refreshWallets(); // Refresh wallets after a short delay
+      // }, 500);
+
       setSuccess("Transaction successful!");
+      setTimeout(() => {
+        setSuccess(null); // Clear success message after a delay
+        onClose(); // Close the modal after success
+      }, 200);
+       // Ensure the modal closes before refreshing wallets
+      // refreshWallets(); // Refresh wallets to reflect the new balance
       setAmount(""); // Clear amount field
       setRecipientAddress(""); // Clear recipient address field
-      console.log("Transaction response:", response);
-      refreshWallets();
+      // console.log("Transaction response:", response);
     } catch (err: any) {
       setError(err.message || "Transaction failed.");
     } finally {
@@ -126,7 +136,14 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         <Button
           variant="contained"
           fullWidth
-          onClick={handleSendFunds}
+          // Send funds and refresh wallets 
+          onClick={() => {
+            handleSendFunds();
+            setTimeout(() => {
+              refreshWallets(); // Refresh wallets after sending funds
+            }, 500); // Delay to ensure modal closes before refreshing
+          }}
+          // onClick={handleSendFunds }
           disabled={loading}
         >
           {loading ? <CircularProgress size={24} /> : "Send"}

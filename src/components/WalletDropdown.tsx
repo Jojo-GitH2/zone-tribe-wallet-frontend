@@ -29,6 +29,8 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  // console.log("Current wallet in WalletSection:", currentWallet);
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     // Optionally call refreshWallets() here if you want to refresh on open

@@ -62,7 +62,7 @@ const AddAccountButton: React.FC = () => {
         currency,
       }); // Call the API
       setWalletAddress(data.address); // Set the wallet address from the response
-      console.log("Wallet created successfully:", data.address);
+      // console.log("Wallet created successfully:", data.address);
       handleClose();
       handleQrModalOpen(data.address);
     } catch (err: any) {

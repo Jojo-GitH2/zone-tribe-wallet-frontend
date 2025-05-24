@@ -32,12 +32,23 @@ export const fetchWalletTransactions = async (
         },
       }
     );
-    console.log("Fetched transactions:", response.data);
+    // console.log("Fetched transactions:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error("Error fetching transactions:", error.response?.data);
+    // console.error("Error fetching transactions:", error.response?.data);
     throw error.response?.data || "Failed to fetch transactions";
   }
+};
+
+// Fetch all transactions for a wallet
+export const fetchAllWalletTransactions = async (
+  walletAddress: string,
+  token: string
+): Promise<Transaction[]> => {
+  const response = await api.get(`/Wallet/transactions/${walletAddress}/all`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data.items || response.data; // Adjust based on backend response
 };
 
 // Add other transaction-related functions here in the future

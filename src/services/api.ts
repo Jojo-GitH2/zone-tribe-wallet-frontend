@@ -43,7 +43,7 @@ api.interceptors.response.use(
 
                 return api(originalRequest);
             } catch (err) {
-                console.error("Failed to refresh access token:", err);
+                // console.error("Failed to refresh access token:", err);
                 throw err;
             }
         }
