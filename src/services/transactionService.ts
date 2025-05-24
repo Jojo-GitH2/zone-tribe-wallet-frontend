@@ -48,7 +48,29 @@ export const fetchAllWalletTransactions = async (
   const response = await api.get(`/Wallet/transactions/${walletAddress}/all`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return response.data.items || response.data; // Adjust based on backend response
+  console.log("Fetched all transactions:", response.data);
+  return response.data; // Adjust based on backend response
+};
+
+export const searchWalletTransactions = async (
+  walletAddress: string,
+  token: string,
+  page: number,
+  pageSize: number,
+  searchTerm: string
+): Promise<PaginatedTransactions> => {
+  const response = await api.get(
+    `/Wallet/transactions/${walletAddress}`,
+    {
+      params: {
+        pageNumber: page,
+        pageSize: pageSize,
+        searchTerm: searchTerm,
+      },
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
 };
 
 // Add other transaction-related functions here in the future

@@ -26,6 +26,7 @@ import {
   fetchWalletTransactions,
   Transaction,
   fetchAllWalletTransactions,
+  searchWalletTransactions,
 } from "../services/transactionService";
 import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
@@ -39,9 +40,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [value, setValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>(
-    []
-  );
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    Transaction[]
+  >([]);
   const [exportAnchorEl, setExportAnchorEl] = useState<null | HTMLElement>(
     null
   );
@@ -60,11 +61,19 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const handleExport = async (format: "csv" | "pdf") => {
     const token = localStorage.getItem("accessToken");
     if (!currentWallet || !token) return;
-    const allTransactions = await fetchAllWalletTransactions(currentWallet.address, token);
+    const allTransactions = await fetchAllWalletTransactions(
+      currentWallet.address,
+      token
+    );
+
+    console.log("All Transactions: ", allTransactions);
+
+    // Defensive: fallback to empty array if undefined or null
+    const safeTransactions = Array.isArray(allTransactions) ? allTransactions : [];
 
     if (format === "csv") {
       const header = "ID,Date,Amount,Type,Status\n";
-      const rows = allTransactions
+      const rows = safeTransactions
         .map(
           (t) =>
             `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${
@@ -94,7 +103,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       (doc as any).autoTable({
         startY: 22,
         head: [["ID", "Date", "Amount", "Type", "Status"]],
-        body: allTransactions.map((t) => [
+        body: safeTransactions.map((t) => [
           t.transactionId,
           new Date(t.dateTime).toLocaleString(),
           t.amount,
@@ -146,16 +155,23 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     setValue(newValue);
   };
 
-  const handleSearch = () => {
-    const q = searchQuery.toLowerCase();
-    setFilteredTransactions(
-      transactions.filter(
-        (t) =>
-          t.transactionId.toLowerCase().includes(q) ||
-          t.dateTime.toLowerCase().includes(q) ||
-          t.amount.toString().includes(q)
-      )
+  const handleSearch = async () => {
+    if (!currentWallet) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    const data = await searchWalletTransactions(
+      currentWallet.address,
+      token,
+      page,
+      pageSize,
+      searchQuery
     );
+
+    console.log("Search Results: ", data);
+    setTransactions(data.items);
+    setFilteredTransactions(data.items);
+    setTotalCount(data.totalCount);
   };
 
   return (
