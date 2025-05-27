@@ -5,6 +5,7 @@ import {
   Box,
   Typography,
   Alert,
+  CircularProgress
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useContext } from "react";
@@ -15,11 +16,13 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError(null); // Clear previous errors
 
     if (password !== confirmPassword) {
@@ -32,6 +35,8 @@ export default function Register() {
       navigate("/login"); // Redirect to the login page after successful registration
     } catch (err) {
       setError("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,8 +85,9 @@ export default function Register() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
-            Sign Up
+          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}
+            disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : "Sign Up"}
           </Button>
         </form>
         <Typography variant="body2" sx={{ mt: 2 }}>

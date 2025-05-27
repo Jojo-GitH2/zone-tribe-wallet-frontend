@@ -18,6 +18,7 @@ import {
   MenuItem,
   Tooltip,
   Pagination,
+  CircularProgress,
 } from "@mui/material";
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
@@ -50,6 +51,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
 
   const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
     setExportAnchorEl(event.currentTarget);
@@ -70,7 +72,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     console.log("All Transactions: ", allTransactions);
 
     // Defensive: fallback to empty array if undefined or null
-    const safeTransactions = Array.isArray(allTransactions) ? allTransactions : [];
+    const safeTransactions = Array.isArray(allTransactions)
+      ? allTransactions
+      : [];
 
     if (format === "csv") {
       const header = "ID,Date,Amount,Type,Status\n";
@@ -127,6 +131,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   };
 
   const handleRefresh = async () => {
+    setLoadingTransactions(true);
     // console.log("Current Wallet ", currentWallet);
     // console.log("Page ", page);
     // console.log("Page Size ", pageSize);
@@ -145,6 +150,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
 
     setTotalCount(data.totalCount);
     // console.log("Total Count ", totalCount);
+    setLoadingTransactions(false);
   };
 
   useEffect(() => {
@@ -157,6 +163,13 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   };
 
   const handleSearch = async () => {
+    setLoadingTransactions(true);
+    if (!searchQuery.trim()) {
+      // If search query is empty, just refresh the transactions
+      await handleRefresh();
+      setLoadingTransactions(false);
+      return;
+    }
     if (!currentWallet) return;
     const token = localStorage.getItem("accessToken");
     if (!token) return;
@@ -172,6 +185,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     console.log("Search Results: ", data);
     setTransactions(data.items);
     setFilteredTransactions(data.items);
+    setLoadingTransactions(false);
     setTotalCount(data.totalCount);
   };
 
@@ -224,8 +238,11 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                   }}
                   placeholder='e.g. "2025-05-21", "0.001", or part of transaction ID'
                 />
-                <Tooltip title='Search by date (YYYY-MM-DD), amount (e.g. 0.001), or transaction ID'>
-                  <InfoOutlinedIcon color="action" sx={{ ml: 1, cursor: "pointer", color: "text.secondary"}} />
+                <Tooltip title="Search by date (YYYY-MM-DD), amount (e.g. 0.001), or transaction ID">
+                  <InfoOutlinedIcon
+                    color="action"
+                    sx={{ ml: 1, cursor: "pointer", color: "text.secondary" }}
+                  />
                 </Tooltip>
                 <Button
                   variant="contained"
@@ -234,7 +251,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                     textTransform: "capitalize",
                     borderRadius: "20px",
                   }}
+                  disabled={loadingTransactions}
                 >
+                  {/* {loadingTransactions ? <CircularProgress size={20} /> : "Search"} */}
                   Search
                 </Button>
                 <IconButton
@@ -280,69 +299,75 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
       </Box>
 
       {/* Scrollable transaction table */}
-      {value === 1 && currentWallet && (
-        <TableContainer
-          component={Paper}
-          sx={{
-            maxHeight: "60vh",
-            overflowY: "auto",
-            mt: 0,
-            // Hide scrollbar by default, show on hover
-            "&::-webkit-scrollbar": {
-              width: 0,
-              transition: "width 0.7s",
-            },
-            "&:hover::-webkit-scrollbar": {
-              width: "2px",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#888",
-              borderRadius: "2px",
-            },
-            "&::-webkit-scrollbar-track": {
-              backgroundColor: "transparent",
-            },
-          }}
-        >
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(filteredTransactions || []).map((transaction) => (
-                <TableRow key={transaction.transactionId}>
-                  <TableCell>{transaction.transactionId}</TableCell>
-                  <TableCell>
-                    <Tooltip title={transaction.dateTime}>
-                      <span>
-                        {new Date(transaction.dateTime).toLocaleString(
-                          undefined,
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "2-digit",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
-                      </span>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell>{transaction.amount}</TableCell>
-                  <TableCell>{transaction.transactionType}</TableCell>
-                  <TableCell>{transaction.status ?? ""}</TableCell>
+      {value === 1 &&
+        currentWallet &&
+        (loadingTransactions ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer
+            component={Paper}
+            sx={{
+              maxHeight: "60vh",
+              overflowY: "auto",
+              mt: 0,
+              // Hide scrollbar by default, show on hover
+              "&::-webkit-scrollbar": {
+                width: 0,
+                transition: "width 0.7s",
+              },
+              "&:hover::-webkit-scrollbar": {
+                width: "2px",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "#888",
+                borderRadius: "2px",
+              },
+              "&::-webkit-scrollbar-track": {
+                backgroundColor: "transparent",
+              },
+            }}
+          >
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Status</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              </TableHead>
+              <TableBody>
+                {(filteredTransactions || []).map((transaction) => (
+                  <TableRow key={transaction.transactionId}>
+                    <TableCell>{transaction.transactionId}</TableCell>
+                    <TableCell>
+                      <Tooltip title={transaction.dateTime}>
+                        <span>
+                          {new Date(transaction.dateTime).toLocaleString(
+                            undefined,
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell>{transaction.amount}</TableCell>
+                    <TableCell>{transaction.transactionType}</TableCell>
+                    <TableCell>{transaction.status ?? ""}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ))}
       {value === 1 && currentWallet && (
         <Pagination
           count={Math.ceil(totalCount / pageSize)}

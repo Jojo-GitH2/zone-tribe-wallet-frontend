@@ -5,6 +5,7 @@ import {
   Box,
   Typography,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useContext } from "react";
@@ -14,17 +15,21 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError(null); // Clear previous errors
     try {
       await authContext?.login(email, password);
       navigate("/dashboard"); // Redirect to the dashboard after successful login
     } catch (err) {
       setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,8 +70,14 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button fullWidth variant="contained" type="submit" sx={{ mt: 2 }}>
-            Sign In
+          <Button
+            fullWidth
+            variant="contained"
+            type="submit"
+            sx={{ mt: 2 }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Sign In"}
           </Button>
         </form>
         <Typography variant="body2" sx={{ mt: 2 }}>
