@@ -154,8 +154,11 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   };
 
   useEffect(() => {
-    handleRefresh();
-    // eslint-disable-next-line
+    if (searchQuery.trim()) {
+      handleSearch();
+    } else {
+      handleRefresh();
+    }
   }, [currentWallet, page]);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
