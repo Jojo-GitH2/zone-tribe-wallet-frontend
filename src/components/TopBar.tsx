@@ -7,6 +7,12 @@ import {
   Menu,
   MenuItem,
   Box,
+  Badge,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  Button,
 } from "@mui/material";
 import {
   NotificationsOutlined,
@@ -14,6 +20,7 @@ import {
 } from "@mui/icons-material"; // Use outlined icons
 import WalletDropdown from "./WalletDropdown";
 import { AuthContext } from "../context/authContext";
+import { NotificationContext } from "../context/notificationContext";
 import { Wallet } from "../types/wallet"; // Import the Wallet type
 
 // interface Wallet {
@@ -41,6 +48,9 @@ const TopBar: React.FC<TopBarProps> = ({
   const userId = authContext?.user?.id; // Get the userId from the context
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
+  const notificationContext = React.useContext(NotificationContext);
+  const unreadCount = notificationContext?.notifications.length || 0;
+  const [notifAnchorEl, setNotifAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -58,6 +68,11 @@ const TopBar: React.FC<TopBarProps> = ({
     handleMenuClose();
     navigate("/login");
   };
+
+  const handleNotifOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotifAnchorEl(event.currentTarget);
+  };
+  const handleNotifClose = () => setNotifAnchorEl(null);
 
   return (
     <AppBar
@@ -90,14 +105,67 @@ const TopBar: React.FC<TopBarProps> = ({
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <IconButton
             sx={{
-              color: "white", // Set icon color to white
-              "&:hover": {
-                bgcolor: "rgba(255, 255, 255, 0.1)", // Add hover effect
-              },
+              color: "white",
+              "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" },
             }}
+            onClick={handleNotifOpen}
           >
-            <NotificationsOutlined />
+            <Badge badgeContent={unreadCount} color="secondary">
+              <NotificationsOutlined />
+            </Badge>
           </IconButton>
+          <Menu
+            anchorEl={notifAnchorEl}
+            open={Boolean(notifAnchorEl)}
+            onClose={handleNotifClose}
+            PaperProps={{ sx: { minWidth: 320, maxHeight: 400 } }}
+          >
+            <Box sx={{ px: 2, pt: 1, pb: 1 }}>
+              <Box sx={{ fontWeight: "bold", mb: 1 }}>Notifications</Box>
+              <List dense>
+                {notificationContext?.notifications.length === 0 && (
+                  <ListItem>
+                    <ListItemText primary="No notifications yet." />
+                  </ListItem>
+                )}
+                {notificationContext?.notifications
+                  .slice()
+                  .reverse()
+                  .map((notif) => (
+                    <React.Fragment key={notif.id}>
+                      <ListItem>
+                        <ListItemText
+                          primary={notif.message}
+                          secondary={notif.timestamp.toLocaleString()}
+                          primaryTypographyProps={{
+                            color:
+                              notif.type === "success"
+                                ? "green"
+                                : notif.type === "error"
+                                ? "red"
+                                : "inherit",
+                          }}
+                        />
+                      </ListItem>
+                      <Divider />
+                    </React.Fragment>
+                  ))}
+              </List>
+              {(notificationContext?.notifications?.length ?? 0) > 0 && (
+                <Button
+                  size="small"
+                  color="secondary"
+                  onClick={() => {
+                    notificationContext?.clearNotifications();
+                    handleNotifClose();
+                  }}
+                  sx={{ mt: 1 }}
+                >
+                  Clear All
+                </Button>
+              )}
+            </Box>
+          </Menu>
           <IconButton
             onClick={handleProfileMenuOpen}
             sx={{
