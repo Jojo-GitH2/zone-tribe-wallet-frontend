@@ -148,6 +148,7 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
           <IconButton
             aria-label="Refresh wallets"
             onClick={refreshWallets}
+            // disabled={loadingWallets} // Disable while loading
             size="small"
             sx={{
               ml: 1,

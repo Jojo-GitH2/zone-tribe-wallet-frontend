@@ -9,6 +9,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  CircularProgress,
 } from "@mui/material";
 import { createWallet } from "../services/walletService";
 import { AuthContext } from "../context/authContext"; // Import AuthContext to get the userId
@@ -168,7 +169,7 @@ const AddAccountButton: React.FC = () => {
             disabled={loading || !walletName}
             sx={{ mt: 2 }}
           >
-            {loading ? "Creating..." : "Create Wallet"}
+            {loading ? <CircularProgress size={20} /> : "Create Wallet"}
           </Button>
         </Box>
       </Modal>
