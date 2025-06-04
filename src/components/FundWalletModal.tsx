@@ -32,7 +32,6 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const [amountError, setAmountError] = useState<string | null>(null);
   const [recipientError, setRecipientError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
   const authContext = useContext(AuthContext);
   const notificationContext = useContext(NotificationContext);
