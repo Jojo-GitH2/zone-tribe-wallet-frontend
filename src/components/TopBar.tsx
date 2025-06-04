@@ -13,6 +13,7 @@ import {
   ListItemText,
   Divider,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import {
   NotificationsOutlined,
@@ -50,7 +51,9 @@ const TopBar: React.FC<TopBarProps> = ({
   const navigate = useNavigate();
   const notificationContext = React.useContext(NotificationContext);
   const unreadCount = notificationContext?.notifications.length || 0;
-  const [notifAnchorEl, setNotifAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [notifAnchorEl, setNotifAnchorEl] = React.useState<null | HTMLElement>(
+    null
+  );
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -134,18 +137,30 @@ const TopBar: React.FC<TopBarProps> = ({
                   .map((notif) => (
                     <React.Fragment key={notif.id}>
                       <ListItem>
-                        <ListItemText
-                          primary={notif.message}
-                          secondary={notif.timestamp.toLocaleString()}
-                          primaryTypographyProps={{
-                            color:
-                              notif.type === "success"
-                                ? "green"
-                                : notif.type === "error"
-                                ? "red"
-                                : "inherit",
-                          }}
-                        />
+                        {notif.message === "Refreshing wallet data..." ? (
+                          <>
+                            <CircularProgress size={18} sx={{ mr: 1 }} />
+                            <ListItemText
+                              primary={notif.message}
+                              primaryTypographyProps={{
+                                color: "text.secondary",
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <ListItemText
+                            primary={notif.message}
+                            secondary={notif.timestamp.toLocaleString()}
+                            primaryTypographyProps={{
+                              color:
+                                notif.type === "success"
+                                  ? "green"
+                                  : notif.type === "error"
+                                  ? "red"
+                                  : "inherit",
+                            }}
+                          />
+                        )}
                       </ListItem>
                       <Divider />
                     </React.Fragment>

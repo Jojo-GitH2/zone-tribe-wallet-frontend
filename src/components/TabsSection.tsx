@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Tabs,
   Tab,
@@ -23,6 +23,7 @@ import {
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { Wallet } from "../types/wallet";
 import {
   fetchWalletTransactions,
@@ -33,6 +34,8 @@ import {
 import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
 import WalletLogo from "../assets/WalletLogo.jpg";
+import { NotificationContext } from "../context/notificationContext";
+
 
 interface TabsSectionProps {
   currentWallet: Wallet | null;
@@ -52,6 +55,14 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [pageSize] = useState(20);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [exportLoading, setExportLoading] = useState<"csv" | "pdf" | null>(
+    null
+  );
+  const [exportSuccess, setExportSuccess] = useState<"csv" | "pdf" | null>(
+    null
+  );
+  const notificationContext = useContext(NotificationContext);
+
 
   const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
     setExportAnchorEl(event.currentTarget);
@@ -62,65 +73,84 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   };
 
   const handleExport = async (format: "csv" | "pdf") => {
-    const token = localStorage.getItem("accessToken");
-    if (!currentWallet || !token) return;
-    const allTransactions = await fetchAllWalletTransactions(
-      currentWallet.address,
-      token
+    setExportLoading(format);
+    setExportSuccess(null);
+    notificationContext?.addNotification(
+      `Preparing ${format.toUpperCase()} export...`,
+      "info"
     );
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!currentWallet || !token) return;
+      const allTransactions = await fetchAllWalletTransactions(
+        currentWallet.address,
+        token
+      );
 
-    console.log("All Transactions: ", allTransactions);
+      // Defensive: fallback to empty array if undefined or null
+      const safeTransactions = Array.isArray(allTransactions)
+        ? allTransactions
+        : [];
 
-    // Defensive: fallback to empty array if undefined or null
-    const safeTransactions = Array.isArray(allTransactions)
-      ? allTransactions
-      : [];
+      if (format === "csv") {
+        const header = "ID,Date,Amount,Type,Status\n";
+        const rows = safeTransactions
+          .map(
+            (t) =>
+              `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${
+                t.dateTime
+              })",${t.amount},${t.transactionType},${t.status ?? ""}`
+          )
+          .join("\n");
+        const csv = header + rows;
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "transactions.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      } else if (format === "pdf") {
+        applyPlugin(jsPDF);
+        const doc = new jsPDF();
+        doc.addImage(WalletLogo, "JPEG", 14, 2, 10, 10);
+        doc.setFontSize(8);
+        doc.text("Exported on " + new Date().toLocaleString(), 200, 5, {
+          align: "right",
+        });
 
-    if (format === "csv") {
-      const header = "ID,Date,Amount,Type,Status\n";
-      const rows = safeTransactions
-        .map(
-          (t) =>
-            `${t.transactionId},"${new Date(t.dateTime).toLocaleString()} (${
-              t.dateTime
-            })",${t.amount},${t.transactionType},${t.status ?? ""}`
-        )
-        .join("\n");
-      const csv = header + rows;
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "transactions.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    } else if (format === "pdf") {
-      applyPlugin(jsPDF);
-      const doc = new jsPDF();
-      doc.addImage(WalletLogo, "JPEG", 14, 2, 10, 10);
-      doc.setFontSize(8);
-      doc.text("Exported on " + new Date().toLocaleString(), 200, 5, {
-        align: "right",
-      });
-
-      doc.setFontSize(12);
-      doc.text("Transaction History", 14, 20);
-      (doc as any).autoTable({
-        startY: 22,
-        head: [["ID", "Date", "Amount", "Type", "Status"]],
-        body: safeTransactions.map((t) => [
-          t.transactionId,
-          new Date(t.dateTime).toLocaleString(),
-          t.amount,
-          t.transactionType,
-          t.status ?? "",
-        ]),
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: "#2c003e" },
-      });
-      doc.save("transactions.pdf");
+        doc.setFontSize(12);
+        doc.text("Transaction History", 14, 20);
+        (doc as any).autoTable({
+          startY: 22,
+          head: [["ID", "Date", "Amount", "Type", "Status"]],
+          body: safeTransactions.map((t) => [
+            t.transactionId,
+            new Date(t.dateTime).toLocaleString(),
+            t.amount,
+            t.transactionType,
+            t.status ?? "",
+          ]),
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: "#2c003e" },
+        });
+        doc.save("transactions.pdf");
+      }
+      setExportSuccess(format);
+      notificationContext?.addNotification(
+        `${format.toUpperCase()} export completed and downloaded.`,
+        "success"
+      );
+    } catch (err) {
+      notificationContext?.addNotification(
+        `Failed to export ${format.toUpperCase()}.`,
+        "error"
+      );
+    } finally {
+      setExportLoading(null);
+      setTimeout(() => setExportSuccess(null), 2000);
+      handleExportClose();
     }
-    handleExportClose();
   };
 
   const handlePageChange = (
@@ -278,8 +308,28 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
                   open={Boolean(exportAnchorEl)}
                   onClose={handleExportClose}
                 >
-                  <MenuItem onClick={() => handleExport("csv")}>CSV</MenuItem>
-                  <MenuItem onClick={() => handleExport("pdf")}>PDF</MenuItem>
+                  <MenuItem
+                    onClick={() => handleExport("csv")}
+                    disabled={!!exportLoading}
+                  >
+                    {exportLoading === "csv" ? (
+                      <CircularProgress size={18} sx={{ mr: 1 }} />
+                    ) : exportSuccess === "csv" ? (
+                      <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+                    ) : null}
+                    Export as CSV
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => handleExport("pdf")}
+                    disabled={!!exportLoading}
+                  >
+                    {exportLoading === "pdf" ? (
+                      <CircularProgress size={18} sx={{ mr: 1 }} />
+                    ) : exportSuccess === "pdf" ? (
+                      <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+                    ) : null}
+                    Export as PDF
+                  </MenuItem>
                 </Menu>
                 <IconButton
                   aria-label="Refresh"

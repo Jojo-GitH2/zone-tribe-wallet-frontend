@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
     const data = await fetchUserWallets(token);
-    // console.log("Fetched wallets - Dashboard:", data);
+    console.log("Fetched wallets - Dashboard:", data);
     setWallets(data);
     // console.log("Wallets after refresh:", data);
 
