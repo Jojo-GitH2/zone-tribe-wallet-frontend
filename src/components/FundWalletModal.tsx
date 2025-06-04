@@ -108,7 +108,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
       }, 1000);
 
       // Add a "refreshing" notification
-      const refreshingNotifId = Date.now();
+      const refreshingNotifId = `${Date.now()}-${Math.random()}`;
       notificationContext?.addNotification(
         "Refreshing wallet data...",
         "info",

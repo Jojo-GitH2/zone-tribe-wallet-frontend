@@ -125,7 +125,27 @@ const TopBar: React.FC<TopBarProps> = ({
           >
             <Box sx={{ px: 2, pt: 1, pb: 1 }}>
               <Box sx={{ fontWeight: "bold", mb: 1 }}>Notifications</Box>
-              <List dense>
+              <List
+                dense
+                sx={{
+                  maxHeight: 260,
+                  overflowY: "auto",
+                  "&::-webkit-scrollbar": {
+                    width: 0,
+                    transition: "width 0.7s",
+                  },
+                  "&:hover::-webkit-scrollbar": {
+                    width: "2px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "#888",
+                    borderRadius: "2px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    backgroundColor: "transparent",
+                  },
+                }}
+              >
                 {notificationContext?.notifications.length === 0 && (
                   <ListItem>
                     <ListItemText primary="No notifications yet." />
