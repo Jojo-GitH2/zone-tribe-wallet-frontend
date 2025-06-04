@@ -108,21 +108,21 @@ const WalletDropdown: React.FC<WalletDropdownProps> = ({
         <Box sx={{ flex: 1, overflowY: "auto" }}>
           {wallets.length > 0 ? (
             wallets.map((wallet) => (
-              <MenuItem
-                key={wallet.id}
-                onClick={() => handleWalletSelect(wallet)}
-              >
-                <ListItemText
-                  primary={wallet.walletName}
-                  secondary={`${wallet.address.slice(
-                    0,
-                    6
-                  )}...${wallet.address.slice(-4)}`}
-                />
-                <Typography variant="body2" sx={{ ml: 2 }}>
-                  {wallet.balance} {wallet.currency}
-                </Typography>
-              </MenuItem>
+              <React.Fragment key={wallet.id}>
+                <MenuItem onClick={() => handleWalletSelect(wallet)}>
+                  <ListItemText
+                    primary={wallet.walletName}
+                    secondary={`${wallet.address.slice(
+                      0,
+                      6
+                    )}...${wallet.address.slice(-4)}`}
+                  />
+                  <Typography variant="body2" sx={{ ml: 2 }}>
+                    {wallet.balance} {wallet.currency}
+                  </Typography>
+                </MenuItem>
+                <Divider key={`divider-${wallet.id}`} />
+              </React.Fragment>
             ))
           ) : (
             <MenuItem>
