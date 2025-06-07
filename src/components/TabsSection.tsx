@@ -19,12 +19,20 @@ import {
   Tooltip,
   Pagination,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { Wallet } from "../types/wallet";
+import { Wallet } from "../types/wallet"; 
+
+interface TabsSectionProps {
+  currentWallet: Wallet | null;
+}
+
 import {
   fetchWalletTransactions,
   Transaction,
@@ -35,11 +43,6 @@ import jsPDF from "jspdf";
 import { applyPlugin } from "jspdf-autotable";
 import WalletLogo from "../assets/WalletLogo.jpg";
 import { NotificationContext } from "../context/notificationContext";
-
-
-interface TabsSectionProps {
-  currentWallet: Wallet | null;
-}
 
 const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
   const [value, setValue] = useState(0);
@@ -62,7 +65,6 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
     null
   );
   const notificationContext = useContext(NotificationContext);
-
 
   const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
     setExportAnchorEl(event.currentTarget);
@@ -232,128 +234,122 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
           zIndex: 10,
           bgcolor: "background.default",
           pb: 2,
-          // borderTop: "0.5px solid rgba(255, 255, 255, 0.2)", // Add a faint right border
         }}
       >
-        <Tabs value={value} onChange={handleChange}>
-          <Tab label="Tokens" />
+        <Tabs value={0} onChange={() => {}}>
           <Tab label="Transactions" />
         </Tabs>
-        {value === 1 && (
-          <Box sx={{ mt: 2 }}>
-            {currentWallet && (
-              <Box
+        <Box sx={{ mt: 2 }}>
+          {currentWallet && (
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                mb: 2,
+                alignItems: "center",
+                bgcolor: "background.default",
+              }}
+            >
+              {/* Search, Refresh, and Export Row */}
+              <TextField
                 sx={{
-                  display: "flex",
-                  gap: 2,
-                  mb: 2,
-                  alignItems: "center",
-                  bgcolor: "background.default",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "20px",
+                    backgroundColor: "background.paper",
+                  },
+                }}
+                label="Search by date, amount, or ID"
+                variant="outlined"
+                fullWidth
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+                placeholder='e.g. "2025-05-21", "0.001", or part of transaction ID'
+              />
+              <Tooltip title="Search by date (YYYY-MM-DD), amount (e.g. 0.001), or transaction ID">
+                <InfoOutlinedIcon
+                  color="action"
+                  sx={{ ml: 1, cursor: "pointer", color: "text.secondary" }}
+                />
+              </Tooltip>
+              <Button
+                variant="contained"
+                onClick={handleSearch}
+                sx={{
+                  textTransform: "capitalize",
+                  borderRadius: "20px",
+                }}
+                disabled={loadingTransactions}
+              >
+                Search
+              </Button>
+              <IconButton
+                aria-label="Export"
+                onClick={handleExportClick}
+                sx={{
+                  color: "white",
+                  bgcolor: "transparent",
+                  borderRadius: "20px",
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
                 }}
               >
-                {/* Search, Refresh, and Export Row */}
-                <TextField
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "20px",
-                      backgroundColor: "background.paper",
-                    },
-                  }}
-                  label="Search by date, amount, or ID"
-                  variant="outlined"
-                  fullWidth
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearch();
-                    }
-                  }}
-                  placeholder='e.g. "2025-05-21", "0.001", or part of transaction ID'
-                />
-                <Tooltip title="Search by date (YYYY-MM-DD), amount (e.g. 0.001), or transaction ID">
-                  <InfoOutlinedIcon
-                    color="action"
-                    sx={{ ml: 1, cursor: "pointer", color: "text.secondary" }}
-                  />
-                </Tooltip>
-                <Button
-                  variant="contained"
-                  onClick={handleSearch}
-                  sx={{
-                    textTransform: "capitalize",
-                    borderRadius: "20px",
-                  }}
-                  disabled={loadingTransactions}
+                <FileDownloadOutlinedIcon />
+              </IconButton>
+              <Menu
+                anchorEl={exportAnchorEl}
+                open={Boolean(exportAnchorEl)}
+                onClose={handleExportClose}
+              >
+                <MenuItem
+                  onClick={() => handleExport("csv")}
+                  disabled={!!exportLoading}
                 >
-                  {/* {loadingTransactions ? <CircularProgress size={20} /> : "Search"} */}
-                  Search
-                </Button>
-                <IconButton
-                  aria-label="Export"
-                  onClick={handleExportClick}
-                  sx={{
-                    color: "white",
-                    bgcolor: "transparent",
-                    borderRadius: "20px",
-                    "&:hover": {
-                      bgcolor: "primary.dark",
-                    },
-                  }}
+                  {exportLoading === "csv" ? (
+                    <CircularProgress size={18} sx={{ mr: 1 }} />
+                  ) : exportSuccess === "csv" ? (
+                    <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+                  ) : null}
+                  Export as CSV
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleExport("pdf")}
+                  disabled={!!exportLoading}
                 >
-                  <FileDownloadOutlinedIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={exportAnchorEl}
-                  open={Boolean(exportAnchorEl)}
-                  onClose={handleExportClose}
-                >
-                  <MenuItem
-                    onClick={() => handleExport("csv")}
-                    disabled={!!exportLoading}
-                  >
-                    {exportLoading === "csv" ? (
-                      <CircularProgress size={18} sx={{ mr: 1 }} />
-                    ) : exportSuccess === "csv" ? (
-                      <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
-                    ) : null}
-                    Export as CSV
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleExport("pdf")}
-                    disabled={!!exportLoading}
-                  >
-                    {exportLoading === "pdf" ? (
-                      <CircularProgress size={18} sx={{ mr: 1 }} />
-                    ) : exportSuccess === "pdf" ? (
-                      <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
-                    ) : null}
-                    Export as PDF
-                  </MenuItem>
-                </Menu>
-                <IconButton
-                  aria-label="Refresh"
-                  onClick={handleRefresh}
-                  sx={{
-                    color: "white",
-                    bgcolor: "transparent",
-                    borderRadius: "20px",
-                    "&:hover": {
-                      bgcolor: "primary.dark",
-                    },
-                  }}
-                >
-                  <RefreshIconOutlined />
-                </IconButton>
-              </Box>
-            )}
-          </Box>
-        )}
+                  {exportLoading === "pdf" ? (
+                    <CircularProgress size={18} sx={{ mr: 1 }} />
+                  ) : exportSuccess === "pdf" ? (
+                    <CheckCircleOutlineIcon color="success" sx={{ mr: 1 }} />
+                  ) : null}
+                  Export as PDF
+                </MenuItem>
+              </Menu>
+              <IconButton
+                aria-label="Refresh"
+                onClick={handleRefresh}
+                sx={{
+                  color: "white",
+                  bgcolor: "transparent",
+                  borderRadius: "20px",
+                  "&:hover": {
+                    bgcolor: "primary.dark",
+                  },
+                }}
+              >
+                <RefreshIconOutlined />
+              </IconButton>
+            </Box>
+          )}
+        </Box>
       </Box>
 
       {/* Scrollable transaction table */}
-      {value === 1 &&
-        currentWallet &&
+      {currentWallet &&
         (loadingTransactions ? (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <CircularProgress />
@@ -365,7 +361,6 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
               maxHeight: "60vh",
               overflowY: "auto",
               mt: 0,
-              // Hide scrollbar by default, show on hover
               "&::-webkit-scrollbar": {
                 width: 0,
                 transition: "width 0.7s",
@@ -421,7 +416,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
             </Table>
           </TableContainer>
         ))}
-      {value === 1 && currentWallet && (
+      {currentWallet && (
         <Pagination
           count={Math.ceil(totalCount / pageSize)}
           page={page}
@@ -430,27 +425,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet }) => {
         />
       )}
 
-      {value === 0 && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "200px",
-            textAlign: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.05)",
-            borderRadius: "8px",
-            color: "text.secondary",
-          }}
-        >
-          <Typography variant="h6" color="textSecondary">
-            {currentWallet
-              ? "Tokens Content"
-              : "Tokens will appear here once you create a wallet."}
-          </Typography>
-        </Box>
-      )}
-      {value === 1 && !currentWallet && (
+      {!currentWallet && (
         <Box
           sx={{
             display: "flex",
