@@ -27,9 +27,9 @@ const Dashboard: React.FC = () => {
 
     setCurrentWallet((prev) => {
       if (prev) {
-        const updated = data.find((w: { id: string; }) => w.id === prev.id);
+        const updated = data.find((w: { id: string }) => w.id === prev.id);
         // Always return a new object reference if found, or fallback to first wallet
-        return updated ? { ...updated } : (data.length > 0 ? data[0] : null);
+        return updated ? { ...updated } : data.length > 0 ? data[0] : null;
       }
       return data.length > 0 ? data[0] : null;
     });
