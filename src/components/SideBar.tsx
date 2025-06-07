@@ -267,9 +267,12 @@ const Sidebar: React.FC<SidebarProps> = ({
               },
             }}
           >
-            <MenuItem onClick={handleFundWallet}>Send</MenuItem>
-            <MenuItem onClick={handleReceive}>Receive</MenuItem>
-            {/* Add more options here if needed */}
+            <MenuItem onClick={handleFundWallet} disabled={!currentWallet}>
+              Send
+            </MenuItem>
+            <MenuItem onClick={handleReceive} disabled={!currentWallet}>
+              Receive
+            </MenuItem>
           </Menu>
         </List>
       </Drawer>
