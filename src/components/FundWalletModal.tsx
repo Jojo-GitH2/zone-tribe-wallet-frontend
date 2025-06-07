@@ -118,7 +118,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         refreshWallets();
         // Remove the "refreshing" notification after refresh
         notificationContext?.clearNotificationById?.(refreshingNotifId);
-      }, 10000);
+      }, 11000);
     } catch (err: any) {
       setError(err.message || "Transaction failed.");
       notificationContext?.addNotification("Failed to send funds.", "error");
