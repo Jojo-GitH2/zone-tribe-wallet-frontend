@@ -43,7 +43,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Sidebar onToggle={handleSidebarToggle} />
+      <Sidebar
+        onToggle={handleSidebarToggle}
+        currentWallet={currentWallet}
+        refreshWallets={refreshWallets}
+      />
       <Box sx={{ flexGrow: 1, p: 3 }}>
         <TopBar
           sidebarWidth={sidebarWidth}

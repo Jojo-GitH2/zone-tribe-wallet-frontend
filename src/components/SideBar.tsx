@@ -8,22 +8,38 @@ import {
   Typography,
   IconButton,
   Box,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   ChevronLeft,
   ChevronRight,
   DashboardOutlined as DashboardIcon,
+  SwapHoriz as SwapHorizIcon,
+  ArrowRight as ArrowRightIcon,
 } from "@mui/icons-material";
 
 // Import the logo
 import WalletLogo from "../assets/WalletLogo.png"; // Import the wallet logo
+import FundWalletModal from "./FundWalletModal"; // Import your modal
+import QRCodeModal from "./QRCodeModal"; // <-- Add this import
+import { Link } from "react-router-dom";
 
 interface SidebarProps {
   onToggle: (isOpen: boolean) => void; // Callback to notify parent about collapse state
+  currentWallet: any; // <-- add currentWallet prop type
+  refreshWallets: () => void; // <-- add refreshWallets prop type
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  onToggle,
+  currentWallet,
+  refreshWallets,
+}) => {
   const [isOpen, setIsOpen] = useState(true); // Sidebar is open by default
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [fundModalOpen, setFundModalOpen] = useState(false);
+  const [qrModalOpen, setQrModalOpen] = useState(false); // <-- Add state for QR modal
 
   const toggleSidebar = () => {
     const newIsOpen = !isOpen;
@@ -31,23 +47,49 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
     onToggle?.(newIsOpen); // Safely call onToggle
   };
 
+  const handleMoveCryptoClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleDropdownClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleFundWallet = () => {
+    setFundModalOpen(true);
+    setAnchorEl(null);
+  };
+
+  const handleReceive = () => {
+    if (currentWallet) {
+      setQrModalOpen(true);
+    } else {
+      alert("Please select a wallet first.");
+    }
+    setAnchorEl(null);
+  };
+
+  const handleFundWalletModalClose = () => {
+    setFundModalOpen(false);
+  };
+
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <Drawer
         variant="permanent"
         sx={{
-          width: isOpen ? 200 : 50, // Adjust width for open and collapsed states
+          width: isOpen ? 200 : 50,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: isOpen ? 200 : 50, // Adjust drawer width
+            width: isOpen ? 200 : 50,
             boxSizing: "border-box",
-            transition: "width 0.3s ease", // Smooth transition for the width
-            height: "100vh", // Full height
+            transition: "width 0.3s ease",
+            height: "100vh",
             display: "flex",
-            flexDirection: "column", // Stack items vertically
-            alignItems: "flex-start", // Align items to the left
-            overflow: "hidden", // Prevent overflow
-            borderRight: "0.5px solid rgba(255, 255, 255, 0.2)", // Add a faint right border
+            flexDirection: "column",
+            alignItems: "flex-start",
+            overflow: "hidden",
+            borderRight: "0.5px solid rgba(255, 255, 255, 0.2)",
           },
         }}
       >
@@ -59,8 +101,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
             justifyContent: isOpen ? "space-between" : "center",
             width: "100%",
             p: 2,
-            position: "relative", // Allows absolute positioning of the toggle button
-            transition: "all 0.3s ease", // Smooth transition for child elements
+            position: "relative",
+            transition: "all 0.3s ease",
           }}
         >
           {isOpen ? (
@@ -68,8 +110,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
               variant="h5"
               sx={{
                 fontWeight: "bold",
-                transition: "opacity 0.3s ease", // Smooth fade-in/out for text
-                opacity: isOpen ? 1 : 0, // Hide text when collapsed
+                transition: "opacity 0.3s ease",
+                opacity: isOpen ? 1 : 0,
               }}
             >
               Zone Tribe Wallet
@@ -81,16 +123,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
                 justifyContent: "center",
                 alignItems: "center",
                 width: "100%",
-                transition: "all 0.3s ease", // Smooth transition for logo
+                transition: "all 0.3s ease",
               }}
             >
               <img
-                src={WalletLogo} // Use the imported logo image
+                src={WalletLogo}
                 alt="Logo"
                 style={{
                   width: 60,
                   height: 60,
-                  transition: "all 0.3s ease", // Smooth transition for logo size
+                  transition: "all 0.3s ease",
                 }}
               />
             </Box>
@@ -98,24 +140,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
           <IconButton
             onClick={toggleSidebar}
             sx={{
-              position: "absolute", // Position the toggle button
-              top: "50%", // Center vertically relative to the box
-              right: "-12px", // Slightly outside the sidebar
-              transform: "translateY(-50%)", // Adjust for perfect centering
-              backgroundColor: "transparent", // Transparent background
-              boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)", // Add a shadow for better visibility
-              color: "white", // Ensure the icon is visible
-              width: 30, // Adjust the size of the button
-              height: 30, // Adjust the size of the button
-              opacity: 0, // Initially invisible
-              transition: "opacity 0.3s ease", // Smooth transition for opacity
-              pointerEvents: "none", // Prevent interaction when invisible
+              position: "absolute",
+              top: "50%",
+              right: "-12px",
+              transform: "translateY(-50%)",
+              backgroundColor: "transparent",
+              boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+              color: "white",
+              width: 30,
+              height: 30,
+              opacity: 0,
+              transition: "opacity 0.3s ease",
+              pointerEvents: "none",
               ".MuiDrawer-root:hover &": {
-                opacity: 0.7, // Translucent when hovering over the sidebar
-                pointerEvents: "auto", // Enable interaction when visible
+                opacity: 0.7,
+                pointerEvents: "auto",
               },
               "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.2)", // Light background on hover
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
               },
             }}
           >
@@ -129,24 +171,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
             flexGrow: 1,
             mt: 4,
             width: "100%",
-            transition: "all 0.3s ease", // Smooth transition for list items
+            transition: "all 0.3s ease",
           }}
         >
           <ListItem
-            component={"a"}
-            href="/dashboard"
+            component={Link}
+            to="/dashboard"
             sx={{
-              justifyContent: isOpen ? "flex-start" : "center", // Align items based on sidebar state
-              px: isOpen ? 2 : 0, // Add padding when open
-              transition: "all 0.3s ease", // Smooth transition for alignment
+              justifyContent: isOpen ? "flex-start" : "center",
+              px: isOpen ? 2 : 0,
+              transition: "all 0.3s ease",
             }}
           >
             <ListItemIcon
               sx={{
-                minWidth: 0, // Remove default spacing
-                justifyContent: "center", // Center the icon
-                color: "white", // Set icon color to white
-                transition: "all 0.3s ease", // Smooth transition for icon
+                minWidth: 0,
+                justifyContent: "center",
+                color: "white",
+                transition: "all 0.3s ease",
               }}
             >
               <DashboardIcon />
@@ -156,17 +198,93 @@ const Sidebar: React.FC<SidebarProps> = ({ onToggle }) => {
                 primary="Dashboard"
                 sx={{
                   textAlign: "left",
-                  marginLeft: 1, // Add margin to the left of the text
-                  whiteSpace: "nowrap", // Prevent text wrapping
-                  color: "white", // Set text color to white
-                  transition: "opacity 0.3s ease", // Smooth fade-in/out for text
-                  opacity: isOpen ? 1 : 0, // Hide text when collapsed
+                  marginLeft: 1,
+                  whiteSpace: "nowrap",
+                  color: "white",
+                  transition: "opacity 0.3s ease",
+                  opacity: isOpen ? 1 : 0,
                 }}
               />
             )}
           </ListItem>
+
+          {/* Move Crypto Dropdown */}
+          <ListItem
+            component="button"
+            onClick={handleMoveCryptoClick}
+            sx={{
+              justifyContent: isOpen ? "flex-start" : "center",
+              px: isOpen ? 2 : 0,
+              transition: "all 0.3s ease",
+              mt: 1,
+              color: "white",
+              backgroundColor: "transparent",
+              border: "none",
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                justifyContent: "center",
+                color: "white",
+                transition: "all 0.3s ease",
+              }}
+            >
+              <SwapHorizIcon />
+            </ListItemIcon>
+            {isOpen && (
+              <ListItemText
+                primary="Move Crypto"
+                sx={{
+                  textAlign: "left",
+                  marginLeft: 1,
+                  whiteSpace: "nowrap",
+                  color: "white",
+                  transition: "opacity 0.3s ease",
+                  opacity: isOpen ? 1 : 0,
+                }}
+              />
+            )}
+            {isOpen && <ArrowRightIcon sx={{ ml: "auto", color: "white" }} />}
+          </ListItem>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleDropdownClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                ml: 1,
+                zIndex: 1400, // Ensure it floats above other content
+              },
+            }}
+          >
+            <MenuItem onClick={handleFundWallet}>Send</MenuItem>
+            <MenuItem onClick={handleReceive}>Receive</MenuItem>
+            {/* Add more options here if needed */}
+          </Menu>
         </List>
       </Drawer>
+      {/* Floating Modal */}
+      <FundWalletModal
+        open={fundModalOpen}
+        onClose={handleFundWalletModalClose}
+        currentWallet={currentWallet} // <-- pass the current wallet object
+        refreshWallets={refreshWallets} // <-- pass the refresh function
+      />
+      <QRCodeModal
+        open={qrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        walletAddress={currentWallet?.address || ""}
+      />
     </Box>
   );
 };
