@@ -9,12 +9,20 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-            window.location.href = "/login"; // Redirect if no token
-            return Promise.reject("No token found");
+        // Only add token for non-auth endpoints
+        const isAuthEndpoint =
+            config.url?.includes("/auth/login") ||
+            config.url?.includes("/auth/register") ||
+            config.url?.includes("/auth/refresh-token");
+
+        if (!isAuthEndpoint) {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                window.location.href = "/login";
+                return Promise.reject("No token found");
+            }
+            config.headers.Authorization = `Bearer ${token}`;
         }
-        config.headers.Authorization = `Bearer ${token}`;
         return config;
     },
     (error) => Promise.reject(error)
