@@ -7,6 +7,7 @@ import WalletSection from "../components/WalletSection";
 import TabsSection from "../components/TabsSection";
 import { fetchUserWallets } from "../services/walletService";
 import { Wallet } from "../types/wallet";
+import { startSignalRConnection, stopSignalRConnection } from "../services/signalRService";
 
 const Dashboard: React.FC = () => {
   const [sidebarWidth, setSidebarWidth] = useState(200);
@@ -37,6 +38,13 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     refreshWallets();
+  }, []);
+
+  useEffect(() => {
+    startSignalRConnection(refreshWallets, refreshWallets); // Both events refresh wallets
+    return () => {
+      stopSignalRConnection();
+    };
   }, []);
 
   const handleWalletSelect = (wallet: Wallet) => setCurrentWallet(wallet);
