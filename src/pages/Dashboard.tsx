@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Box } from "@mui/material";
+import { NotificationContext } from "../context/notificationContext";
 import Sidebar from "../components/SideBar";
 import TopBar from "../components/TopBar";
 import ActionButtons from "../components/ActionButtons";
@@ -7,12 +8,16 @@ import WalletSection from "../components/WalletSection";
 import TabsSection from "../components/TabsSection";
 import { fetchUserWallets } from "../services/walletService";
 import { Wallet } from "../types/wallet";
-import { startSignalRConnection, stopSignalRConnection } from "../services/signalRService";
+import {
+  startSignalRConnection,
+  stopSignalRConnection,
+} from "../services/signalRService";
 
 const Dashboard: React.FC = () => {
   const [sidebarWidth, setSidebarWidth] = useState(200);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
+  const notificationContext = useContext(NotificationContext);
 
   const handleSidebarToggle = (isOpen: boolean) => {
     setSidebarWidth(isOpen ? 200 : 50); // Adjust width based on collapse state
@@ -41,7 +46,16 @@ const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    startSignalRConnection(refreshWallets, refreshWallets); // Both events refresh wallets
+    // Show notification when a transaction is received
+    const handleTransactionReceived = () => {
+      refreshWallets();
+      notificationContext?.addNotification(
+        "New transaction received!",
+        "success"
+      );
+    };
+
+    startSignalRConnection(refreshWallets, handleTransactionReceived);
     return () => {
       stopSignalRConnection();
     };
