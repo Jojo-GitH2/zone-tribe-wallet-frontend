@@ -17,10 +17,9 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
   const [copied, setCopied] = useState(false);
 
   const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(walletAddress); // Copy the wallet address to clipboard
-    setCopied(true); // Show "Copied!" tooltip
-    setTimeout(() => setCopied(false), 3000); // Hide tooltip after 3 seconds
-    // console.log("Wallet address copied to clipboard:", walletAddress); // Log the copied address
+    navigator.clipboard.writeText(walletAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
   };
 
   return (
@@ -31,10 +30,11 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "40vw",
+          width: { xs: "90vw", sm: 400, md: 500 }, // Responsive width
+          maxWidth: "95vw",
           bgcolor: "background.paper",
           boxShadow: 24,
-          p: 4,
+          p: { xs: 2, sm: 4 },
           borderRadius: 2,
           textAlign: "center",
         }}
@@ -42,30 +42,30 @@ const QRCodeModal: React.FC<QRCodeModalProps> = ({
         <Typography variant="h6" component="h2" gutterBottom>
           Wallet Address
         </Typography>
-
-        {/* QR Code */}
-        <QRCodeCanvas
-          value={walletAddress}
-          size={200}
-          includeMargin
-          imageSettings={{
-            src: "../assets/WalletLogo.png", // Replace with your logo's path
-            height: 40,
-            width: 40,
-            excavate: true,
-          }}
-        />
-
-        {/* Wallet Address and Copy Icon */}
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <QRCodeCanvas
+            value={walletAddress}
+            size={window.innerWidth < 400 ? 150 : 200} // Responsive QR size
+            includeMargin
+            imageSettings={{
+              src: "../assets/WalletLogo.png",
+              height: 40,
+              width: 40,
+              excavate: true,
+            }}
+          />
+        </Box>
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             mt: 2,
+            flexWrap: "wrap",
+            wordBreak: "break-all", // Prevent overflow
           }}
         >
-          <Typography variant="body1" sx={{ mr: 1 }}>
+          <Typography variant="body1" sx={{ mr: 1, wordBreak: "break-all" }}>
             {walletAddress}
           </Typography>
           <Tooltip title={copied ? "Copied!" : "Copy"}>
