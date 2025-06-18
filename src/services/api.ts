@@ -18,7 +18,7 @@ api.interceptors.request.use(
         if (!isAuthEndpoint) {
             const token = localStorage.getItem("accessToken");
             if (!token) {
-                window.location.href = "/login";
+                // window.location.href = "/login";
                 return Promise.reject("No token found");
             }
             config.headers.Authorization = `Bearer ${token}`;
@@ -46,7 +46,7 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (err) {
                 // Redirect to login if refresh fails
-                window.location.href = "/login";
+                // window.location.href = "/login";
                 return Promise.reject(err);
             }
         }

@@ -17,6 +17,7 @@ const Dashboard: React.FC = () => {
   const [sidebarWidth, setSidebarWidth] = useState(200);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
+  const [refreshTransactionsFlag, setRefreshTransactionsFlag] = useState(0);
   const notificationContext = useContext(NotificationContext);
 
   const handleSidebarToggle = (isOpen: boolean) => {
@@ -42,24 +43,44 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    // Only refresh wallets on mount
     refreshWallets();
   }, []);
 
-  useEffect(() => {
-    // Show notification when a transaction is received
-    const handleTransactionReceived = () => {
-      refreshWallets();
-      notificationContext?.addNotification(
-        "New transaction received!",
-        "success"
-      );
-    };
+  // useEffect(() => {
+  //   // Only start SignalR if user is authenticated and token exists
+  //   const token = localStorage.getItem("accessToken");
+  //   if (!token) return;
 
-    startSignalRConnection(refreshWallets, handleTransactionReceived);
-    return () => {
-      stopSignalRConnection();
-    };
-  }, []);
+  //   // Show notification when a transaction is received
+  //   const handleTransactionReceived = () => {
+  //     refreshWallets();
+  //     setRefreshTransactionsFlag((f) => f + 1);
+  //   };
+
+  //   startSignalRConnection(handleTransactionReceived, () => {});
+  //   return () => {
+  //     stopSignalRConnection();
+  //   };
+  // }, []);
+
+  // Step 2: Listen for new notifications and refresh wallets if needed
+  useEffect(() => {
+    if (!notificationContext) return;
+    if (notificationContext.notifications.length === 0) return;
+
+    // Get the latest notification
+    const latest = notificationContext.notifications[0];
+    // Adjust this logic to match your backend notification message
+    if (
+      latest &&
+      (latest.message.includes("Received") || latest.message.includes("Sent"))
+    ) {
+      refreshWallets();
+      setRefreshTransactionsFlag((f) => f + 1);
+    }
+    // eslint-disable-next-line
+  }, [notificationContext?.notifications]);
 
   const handleWalletSelect = (wallet: Wallet) => setCurrentWallet(wallet);
 
@@ -83,7 +104,10 @@ const Dashboard: React.FC = () => {
           refreshWallets={refreshWallets}
         />
         <WalletSection currentWallet={currentWallet} />
-        <TabsSection currentWallet={currentWallet} />
+        <TabsSection
+          currentWallet={currentWallet}
+          refreshTrigger={refreshTransactionsFlag}
+        />
       </Box>
     </Box>
   );

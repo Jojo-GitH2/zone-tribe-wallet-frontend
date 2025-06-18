@@ -121,7 +121,13 @@ const TopBar: React.FC<TopBarProps> = ({
             anchorEl={notifAnchorEl}
             open={Boolean(notifAnchorEl)}
             onClose={handleNotifClose}
-            PaperProps={{ sx: { minWidth: 320, maxHeight: 400 } }}
+            PaperProps={{
+              sx: {
+                minWidth: 250, // Reduced from 320
+                maxWidth: 320, // Add a maxWidth for safety
+                maxHeight: 400,
+              },
+            }}
           >
             <Box sx={{ px: 2, pt: 1, pb: 1 }}>
               <Box sx={{ fontWeight: "bold", mb: 1 }}>Notifications</Box>
@@ -130,6 +136,7 @@ const TopBar: React.FC<TopBarProps> = ({
                 sx={{
                   maxHeight: 260,
                   overflowY: "auto",
+                  overflowX: "hidden", // Prevent horizontal scrolling
                   "&::-webkit-scrollbar": {
                     width: 0,
                     transition: "width 0.7s",
@@ -153,7 +160,11 @@ const TopBar: React.FC<TopBarProps> = ({
                 )}
                 {notificationContext?.notifications
                   .slice()
-                  .reverse()
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime()
+                  )
                   .map((notif) => (
                     <React.Fragment key={notif.id}>
                       <ListItem>
@@ -170,7 +181,9 @@ const TopBar: React.FC<TopBarProps> = ({
                         ) : (
                           <ListItemText
                             primary={notif.message}
-                            secondary={notif.timestamp.toLocaleString()}
+                            secondary={new Date(
+                              notif.createdAt
+                            ).toLocaleString()}
                             primaryTypographyProps={{
                               color:
                                 notif.type === "success"
@@ -178,6 +191,16 @@ const TopBar: React.FC<TopBarProps> = ({
                                   : notif.type === "error"
                                   ? "red"
                                   : "inherit",
+                              sx: {
+                                whiteSpace: "normal",
+                                wordBreak: "break-word",
+                              },
+                            }}
+                            secondaryTypographyProps={{
+                              sx: {
+                                whiteSpace: "normal",
+                                wordBreak: "break-word",
+                              },
                             }}
                           />
                         )}

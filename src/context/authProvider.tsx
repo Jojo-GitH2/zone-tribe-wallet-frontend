@@ -6,6 +6,7 @@ import { mapClaimsToUser } from "../utils/mapClaims";
 import { User } from "../types/user";
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
   // Rehydrate user state from localStorage on app initialization
@@ -17,6 +18,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const mappedUser = mapClaimsToUser(decodedToken);
       setUser(mappedUser);
     }
+    setLoading(false);
   }, []);
 
   const handleLogin = async (email: string, password: string) => {
@@ -48,7 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated: !!user,
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

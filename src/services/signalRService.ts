@@ -1,4 +1,5 @@
 import * as signalR from "@microsoft/signalr";
+import { Console } from "console";
 
 let connection: signalR.HubConnection | null = null;
 
@@ -6,7 +7,7 @@ type WalletUpdateCallback = () => void;
 
 export const startSignalRConnection = (
     onWalletUpdate: WalletUpdateCallback,
-    onTransactionReceived?: WalletUpdateCallback
+    onNotificationCreated: (notification: Notification) => void
 ) => {
     if (connection) return; // Prevent multiple connections
 
@@ -27,12 +28,12 @@ export const startSignalRConnection = (
                 onWalletUpdate();
                 console.log("Wallet updated, refreshing wallets");
             });
-            if (onTransactionReceived) {
-                connection?.on("TransactionReceived", () => {
-                    onTransactionReceived();
-                    console.log("Transaction received, refreshing wallets");
-                });
-            }
+            console.log("SignalR Connection Established");
+            connection?.on("NotificationCreated", (notification: Notification) => {
+                onNotificationCreated(notification);
+                console.log("Notification received:", notification);
+            });
+            console.log("SignalR Notification Handler Registered");
         })
         .catch((err) => console.error("SignalR Connection Error:", err));
 };

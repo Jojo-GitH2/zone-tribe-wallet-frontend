@@ -32,6 +32,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
   const [success, setSuccess] = useState<string | null>(null);
   const [amountError, setAmountError] = useState<string | null>(null);
   const [recipientError, setRecipientError] = useState<string | null>(null);
+  const [showRefreshing, setShowRefreshing] = useState(false);
 
   const authContext = useContext(AuthContext);
   const notificationContext = useContext(NotificationContext);
@@ -92,11 +93,6 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         token
       );
 
-      notificationContext?.addNotification(
-        "Funds sent successfully!",
-        "success"
-      );
-
       setSuccess("Transaction successful!");
 
       setTimeout(() => {
@@ -106,18 +102,15 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         setRecipientAddress("");
       }, 1000);
 
-      // Add a "refreshing" notification
-      const refreshingNotifId = `${Date.now()}-${Math.random()}`;
-      notificationContext?.addNotification(
+      // Show a temporary "refreshing" notification in the global notification list
+      notificationContext?.addTemporaryNotification?.(
         "Refreshing wallet data...",
-        "info",
-        refreshingNotifId
+        "info"
       );
 
       setTimeout(() => {
         refreshWallets();
-        // Remove the "refreshing" notification after refresh
-        notificationContext?.clearNotificationById?.(refreshingNotifId);
+        // No need to manually remove, handled by context
       }, 11000);
     } catch (err: any) {
       setError(err.message || "Transaction failed.");
@@ -155,6 +148,14 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
             {success}
           </Typography>
         )}
+        {showRefreshing && (
+          <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+            <CircularProgress size={20} sx={{ mr: 1 }} />
+            <Typography variant="body2" color="textSecondary">
+              Refreshing wallet data...
+            </Typography>
+          </Box>
+        )}
         <TextField
           label="Amount"
           variant="outlined"
@@ -178,21 +179,11 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
         <Button
           variant="contained"
           fullWidth
-          onClick={() => {
-            handleSendFunds();
-          }}
+          onClick={handleSendFunds}
           disabled={loading}
         >
           {loading ? <CircularProgress size={24} /> : "Send"}
         </Button>
-        {/* {refreshing && (
-          <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-            <CircularProgress size={20} sx={{ mr: 1 }} />
-            <Typography variant="body2" color="textSecondary">
-              Refreshing wallet data...
-            </Typography>
-          </Box>
-        )} */}
       </Box>
     </Modal>
   );
