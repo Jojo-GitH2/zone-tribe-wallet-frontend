@@ -1,5 +1,4 @@
 import * as signalR from "@microsoft/signalr";
-import { Console } from "console";
 
 let connection: signalR.HubConnection | null = null;
 

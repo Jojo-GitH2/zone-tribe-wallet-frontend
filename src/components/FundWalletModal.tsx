@@ -114,7 +114,7 @@ const FundWalletModal: React.FC<FundWalletModalProps> = ({
       }, 11000);
     } catch (err: any) {
       setError(err.message || "Transaction failed.");
-      notificationContext?.addNotification("Failed to send funds.", "error");
+      // notificationContext?.addNotification("Failed to send funds.", "error");
     } finally {
       setLoading(false);
     }

@@ -7,7 +7,10 @@ import React, {
 } from "react";
 import api from "../services/api";
 import { AuthContext } from "./authContext";
-import { startSignalRConnection, stopSignalRConnection } from "../services/signalRService";
+import {
+  startSignalRConnection,
+  stopSignalRConnection,
+} from "../services/signalRService";
 
 export type Notification = {
   id: string;

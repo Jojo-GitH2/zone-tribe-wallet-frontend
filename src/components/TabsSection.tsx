@@ -27,7 +27,7 @@ import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { Wallet } from "../types/wallet"; 
+import { Wallet } from "../types/wallet";
 
 interface TabsSectionProps {
   currentWallet: Wallet | null;
@@ -45,7 +45,10 @@ import { applyPlugin } from "jspdf-autotable";
 import WalletLogo from "../assets/WalletLogo.jpg";
 import { NotificationContext } from "../context/notificationContext";
 
-const TabsSection: React.FC<TabsSectionProps> = ({ currentWallet, refreshTrigger }) => {
+const TabsSection: React.FC<TabsSectionProps> = ({
+  currentWallet,
+  refreshTrigger,
+}) => {
   // Now you can use refreshTrigger inside your component
   const [value, setValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
