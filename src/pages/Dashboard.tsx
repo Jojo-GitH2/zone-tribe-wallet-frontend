@@ -18,6 +18,7 @@ const Dashboard: React.FC = () => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [currentWallet, setCurrentWallet] = useState<Wallet | null>(null);
   const [refreshTransactionsFlag, setRefreshTransactionsFlag] = useState(0);
+  const [lastNotifId, setLastNotifId] = useState<string | null>(null);
   const notificationContext = useContext(NotificationContext);
 
   const handleSidebarToggle = (isOpen: boolean) => {
@@ -45,6 +46,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     // Only refresh wallets on mount
     refreshWallets();
+    console.log("Dashboard refresh")
   }, []);
 
   // useEffect(() => {
@@ -69,14 +71,15 @@ const Dashboard: React.FC = () => {
     if (!notificationContext) return;
     if (notificationContext.notifications.length === 0) return;
 
-    // Get the latest notification
     const latest = notificationContext.notifications[0];
-    // Adjust this logic to match your backend notification message
     if (
       latest &&
+      latest.id !== lastNotifId &&
       (latest.message.includes("Received") || latest.message.includes("Sent"))
     ) {
+      setLastNotifId(latest.id);
       refreshWallets();
+      console.log("Notifications refresh")
       setRefreshTransactionsFlag((f) => f + 1);
     }
     // eslint-disable-next-line
