@@ -14,7 +14,6 @@ import {
 import { createWallet } from "../services/walletService";
 import { AuthContext } from "../context/authContext"; // Import AuthContext to get the userId
 import QRCodeModal from "./QRCodeModal";
-import { NotificationContext } from "../context/notificationContext";
 
 const AddAccountButton: React.FC = () => {
   const [open, setOpen] = useState(false); // Modal state
@@ -27,7 +26,7 @@ const AddAccountButton: React.FC = () => {
   const [error, setError] = useState(""); // Error state
 
   const authContext = useContext(AuthContext); // Access the userId from AuthContext
-  const notificationContext = useContext(NotificationContext);
+  // const notificationContext = useContext(NotificationContext);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {

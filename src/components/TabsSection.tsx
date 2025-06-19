@@ -19,9 +19,6 @@ import {
   Tooltip,
   Pagination,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
 } from "@mui/material";
 import RefreshIconOutlined from "@mui/icons-material/Refresh";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
@@ -50,9 +47,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({
   refreshTrigger,
 }) => {
   // Now you can use refreshTrigger inside your component
-  const [value, setValue] = useState(0);
+  // const [value, setValue] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  // const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<
     Transaction[]
   >([]);
@@ -181,7 +178,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({
       page,
       pageSize
     );
-    setTransactions(data.items);
+    // setTransactions(data.items);
     setFilteredTransactions(data.items);
     // console.log("Filtered Transactions ", filteredTransactions);
 
@@ -198,9 +195,9 @@ const TabsSection: React.FC<TabsSectionProps> = ({
     }
   }, [currentWallet, page, refreshTrigger]);
 
-  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
+  // const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
+  //   setValue(newValue);
+  // };
 
   const handleSearch = async () => {
     setLoadingTransactions(true);
@@ -223,7 +220,7 @@ const TabsSection: React.FC<TabsSectionProps> = ({
     );
 
     console.log("Search Results: ", data);
-    setTransactions(data.items);
+    // setTransactions(data.items);
     setFilteredTransactions(data.items);
     setLoadingTransactions(false);
     setTotalCount(data.totalCount);

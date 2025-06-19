@@ -11,7 +11,7 @@ export const startSignalRConnection = (
     if (connection) return; // Prevent multiple connections
 
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5063/hubs/transactions", {
+        .withUrl("http://localhost:8080/hubs/transactions", {
             accessTokenFactory: () => localStorage.getItem("accessToken") || ""
         })
         .withAutomaticReconnect()

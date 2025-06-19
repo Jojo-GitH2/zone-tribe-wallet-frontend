@@ -8,10 +8,6 @@ import WalletSection from "../components/WalletSection";
 import TabsSection from "../components/TabsSection";
 import { fetchUserWallets } from "../services/walletService";
 import { Wallet } from "../types/wallet";
-import {
-  startSignalRConnection,
-  stopSignalRConnection,
-} from "../services/signalRService";
 
 const Dashboard: React.FC = () => {
   const [sidebarWidth, setSidebarWidth] = useState(200);
