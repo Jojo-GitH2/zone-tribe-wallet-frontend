@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, CircularProgress, Typography, Paper } from "@mui/material";
+import { CircularProgress, Typography, Paper } from "@mui/material";
 
 const LoaderOverlay: React.FC<{ message?: string }> = ({ message = "Loading..." }) => (
   <Paper
