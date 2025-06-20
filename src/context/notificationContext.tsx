@@ -34,6 +34,7 @@ interface NotificationContextType {
   ) => void;
   clearNotifications: () => Promise<void>;
   clearNotificationById?: (id: string) => Promise<void>;
+  loading: boolean;
 }
 
 export const NotificationContext =
@@ -43,7 +44,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const authContext = useContext(AuthContext);
 
   useEffect(() => {
@@ -52,24 +53,23 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
 
     if (!userId || !token) {
       setNotifications([]);
+      setLoading(false);
       return;
     }
 
-    // Fetch notifications on login or when user changes
     const fetchNotifications = async () => {
-      // setLoading(true);
+      setLoading(true);
       try {
         const res = await api.get("/notifications");
         setNotifications(res.data);
       } catch {
         setNotifications([]);
       } finally {
-        // setLoading(false);
+        setLoading(false);
       }
     };
     fetchNotifications();
 
-    // Listen for real-time notifications
     startSignalRConnection(
       () => {},
       (notification: any) => {
@@ -154,6 +154,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
         addTemporaryNotification,
         clearNotifications,
         clearNotificationById,
+        loading,
       }}
     >
       {children}
