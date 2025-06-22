@@ -11,7 +11,7 @@ export const startSignalRConnection = (
     if (connection) return; // Prevent multiple connections
 
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:8080/hubs/transactions", {
+        .withUrl(import.meta.env.VITE_SIGNALR_URL, {
             accessTokenFactory: () => localStorage.getItem("accessToken") || ""
         })
         .withAutomaticReconnect()

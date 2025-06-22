@@ -5,7 +5,9 @@ import { AuthContext } from "./authContext";
 import { mapClaimsToUser } from "../utils/mapClaims";
 import { User } from "../types/user";
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
@@ -48,6 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         register: handleRegister,
         logout: handleLogout,
         isAuthenticated: !!user,
+        loading
       }}
     >
       {!loading && children}

@@ -48,6 +48,8 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
   const authContext = useContext(AuthContext);
 
   useEffect(() => {
+    if (authContext?.loading) return; // Wait for auth to finish loading
+
     const userId = authContext?.user?.id;
     const token = localStorage.getItem("accessToken");
 
@@ -86,7 +88,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
     );
 
     return () => stopSignalRConnection();
-  }, [authContext?.user?.id]);
+  }, [authContext?.user?.id, authContext?.loading]);
 
   // You can remove addNotification if backend handles all notification creation
   const addNotification = async (

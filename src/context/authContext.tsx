@@ -7,6 +7,7 @@ export interface AuthContextType {
   register: (email: string, password: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean; // <-- Add this line
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
